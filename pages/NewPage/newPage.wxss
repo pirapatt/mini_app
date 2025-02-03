@@ -1,0 +1,16 @@
+/* กำหนดสไตล์สำหรับปุ่ม */
+.custom-btn {
+  background-color:#FFA500  ;  /* สีพื้นหลังปุ่ม */
+  color: white;               /* สีตัวอักษร */
+  padding: 12px 20px;         /* ขนาด padding ของปุ่ม */
+  border: none;               /* ลบขอบปุ่ม */
+  border-radius: 8px;         /* ขอบปุ่มโค้งมน */
+  font-size: 16px;            /* ขนาดฟอนต์ */
+  cursor: pointer;           /* เปลี่ยนเคอร์เซอร์เป็น pointer เมื่อวางเมาส์ */
+  transition: background-color 0.3s; /* การเปลี่ยนแปลงสีเมื่อกดปุ่ม */
+}
+
+/* เมื่อผู้ใช้กดปุ่ม (เพิ่มเอฟเฟกต์) */
+.custom-btn:active {
+  background-color: #005bb5;  /* เปลี่ยนสีพื้นหลังเมื่อกด */
+}

@@ -1,0 +1,4 @@
+<view class="container">
+    <text style="font-weight: bold">Use API wx.navigateBack</text>
+    <button bindtap="handleNavigateBack" class="custom-btn">Go Back</button>
+</view>

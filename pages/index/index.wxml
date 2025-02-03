@@ -1,0 +1,21 @@
+<view class="container">
+  <text>{{title}}</text>
+  <!-- แสดงปุ่มในหน้าปัจจุบัน -->
+  
+  <block wx:for="{{visibleButtons}}" wx:key="index">
+    <button bindtap="handleButtonTap" data-action="{{item.action}}" class="btn">
+      {{item.label}}
+    </button>
+  </block>
+
+  <!-- ปุ่มควบคุมการเปลี่ยนหน้า -->
+  <view class="pagination">
+    <button bindtap="prevPage" class="nav-btn" wx:if="{{currentPage > 0}}">Previous</button>
+    <button bindtap="nextPage" class="nav-btn" wx:if="{{(currentPage + 1) * buttonsPerPage < allButtons.length}}">Next</button>
+  </view>
+
+  <!-- กล่องแสดงผลข้อมูล -->
+  <view class="info-box">
+    <text>{{info}}</text>
+  </view>
+</view>
