@@ -30,9 +30,12 @@ Page({
       { label: 'ReportEvent', action: 'reportEvent' },
       { label: '', action: '' },
       { label: '', action: '' },
-      { label: 'CreateOffscreenCanvas', action: '' },
-      { label: 'CreateCanvasContext', action: '' },
-      { label: 'CanvasToTempFilePath', action: '' },
+      { label: 'GoToCanvas', action: 'navigateToCanvas' },
+      { label: '', action: '' },
+      { label: '', action: '' },
+      // { label: 'CreateOffscreenCanvas', action: '' },
+      // { label: 'CreateCanvasContext', action: '' },
+      // { label: 'CanvasToTempFilePath', action: '' },
       { label: 'CreateWorker', action: 'createWorkerFunction' },
       { label: '', action: '' },
       { label: '', action: '' },
@@ -165,6 +168,19 @@ Page({
     // ใช้ wx.navigateTo เพื่อไปยังหน้าใหม่
     wx.navigateTo({
       url: '/pages/video/video',
+      success: function () {
+        console.log('Navigation successful');
+      },
+      fail: function () {
+        console.log('Navigation failed');
+      }
+    });
+  },
+
+  navigateToCanvas() {
+    // ใช้ wx.navigateTo เพื่อไปยังหน้าใหม่
+    wx.navigateTo({
+      url: '/pages/canvas/canvas',
       success: function () {
         console.log('Navigation successful');
       },

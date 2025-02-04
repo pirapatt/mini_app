@@ -1,0 +1,5 @@
+<view class="canvas-container">
+  <button bindtap="createCanvas">สร้างวงกลม</button>
+  <canvas id="myCanvas" style="width: 300px; height: 300px;"></canvas> <!-- ใช้ canvas id นี้ -->
+  <image src="{{imagePath}}" mode="aspectFit" style="width: 300px; height: 300px;" />
+</view>

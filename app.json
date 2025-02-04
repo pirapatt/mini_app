@@ -4,7 +4,8 @@
         "pages/logs/logs",
         "pages/NewPage/newPage",
         "pages/newPage2/newPage2",
-        "pages/video/video"
+        "pages/video/video",
+        "pages/canvas/canvas"
     ],
     "style": "v2",
     "window": {
