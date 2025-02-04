@@ -1,0 +1,11 @@
+<view class="container">
+  <!-- วิดีโอที่ต้องการควบคุม -->
+  <video id="myVideo" src="http://www.w3schools.com/html/mov_bbb.mp4" 
+         controls autoplay loop style="width: 100%; height: 300px;">
+  </video>
+
+  <!-- ปุ่มควบคุมวิดีโอ -->
+  <button bindtap="playVideo">เล่นวิดีโอ ▶️</button>
+  <button bindtap="pauseVideo">หยุดวิดีโอ ⏸️</button>
+  <button bindtap="seekVideo">ข้ามไป 10 วินาที ⏩</button>
+</view>

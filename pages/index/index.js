@@ -36,14 +36,14 @@ Page({
       { label: 'CreateWorker', action: 'createWorkerFunction' },
       { label: '', action: '' },
       { label: '', action: '' },
-      { label: 'CreateVideoContext', action: '' },
-      { label: 'StartRecord', action: '' },
+      { label: 'CreateVideoContext', action: 'navigateToVideoContext' },
+      { label: 'PreviewImage', action: 'previewImage' },
       { label: 'ChooseImage', action: 'chooseImage' },
       { label: 'CreateSelectorQuery', action: '' },
       { label: 'CreateIntersectionObserver', action: '' },
       { label: 'NodesRef', action: '' },
-      { label: 'SaveFile', action: 'saveFile' },
-      { label: 'OpenDocument', action: 'openDocument' },
+      { label: 'SaveFile & OpenDocument', action: 'saveFile' },
+      { label: '', action: '' },
       { label: 'GetSavedFileList', action: 'getSavedFileList' },
       { label: 'ScanCode', action: 'scanQRCode' },
       { label: '', action: '' },
@@ -161,6 +161,19 @@ Page({
     });
   },
 
+  navigateToVideoContext() {
+    // ใช้ wx.navigateTo เพื่อไปยังหน้าใหม่
+    wx.navigateTo({
+      url: '/pages/video/video',
+      success: function () {
+        console.log('Navigation successful');
+      },
+      fail: function () {
+        console.log('Navigation failed');
+      }
+    });
+  },
+
   // ฟังก์ชันเมื่อกดปุ่ม 'EventChanel'
   handleEventChanelTap() {
     wx.navigateTo({
@@ -262,7 +275,6 @@ Page({
       }
     });
   },
-
 
   // Show Toast
   showToast() {
@@ -527,47 +539,77 @@ Page({
   },
 
   saveFile() {
-    wx.saveFile({
-      tempFilePath: '/tmp/mp4s17v6ok9b3f8c..cb4QMoFMnor020b562cbb2aa52eb2310e9e824f628ed.pdf',  // Path to the temporary file
-      success(res) {
-        console.log('File saved successfully:', res.savedFilePath);
-        wx.showToast({
-          title: 'บันทึกไฟล์สำเร็จ',
-          icon: 'success',
-        });
+    wx.downloadFile({
+      url: 'http://localhost:8080/download/The2024.pdf',
+      success: (res) => {
+        if (res.statusCode === 200) {
+          const tempFilePath = res.tempFilePath;
+          console.log('ดาวน์โหลดไฟล์สำเร็จ:', tempFilePath);
+
+          wx.saveFile({
+            tempFilePath: tempFilePath,
+            success: (saveRes) => {
+              console.log('บันทึกไฟล์สำเร็จ:', saveRes.savedFilePath);
+              this.setData({
+                info: 'ดาวน์โหลดและบันทึกไฟล์สำเร็จ: ' + saveRes.savedFilePath
+              });
+
+              // เปิดไฟล์ที่บันทึก
+              this.openDocument(saveRes.savedFilePath);
+            },
+            fail: (err) => {
+              console.log('บันทึกไฟล์ล้มเหลว:', err);
+              wx.showToast({
+                title: 'ไม่สามารถบันทึกไฟล์ได้',
+                icon: 'error',
+              });
+            }
+          });
+        } else {
+          wx.showToast({
+            title: 'ดาวน์โหลดล้มเหลว',
+            icon: 'error',
+          });
+        }
       },
-      fail(error) {
-        console.log('Failed to save file:', error);
+      fail: (error) => {
+        console.log('ดาวน์โหลดล้มเหลว:', error);
         wx.showToast({
-          title: 'บันทึกไฟล์ล้มเหลว',
+          title: 'ดาวน์โหลดล้มเหลว',
           icon: 'error',
         });
       }
     });
   },
 
-  openDocument() {
+  openDocument(filePath) {
     wx.openDocument({
-      filePath: '/path/to/your/saved/file',  // Path to the saved document
-      success() {
-        console.log('Document opened successfully');
+      filePath: filePath,
+      success: (res) => {
+        console.log('เปิดไฟล์สำเร็จ');
       },
-      fail(error) {
-        console.log('Failed to open document:', error);
+      fail: (err) => {
+        console.log('เปิดไฟล์ล้มเหลว:', err);
         wx.showToast({
-          title: 'เปิดเอกสารล้มเหลว',
+          title: 'ไม่สามารถเปิดไฟล์ได้',
           icon: 'error',
         });
       }
     });
   },
+
+
   getSavedFileList() {
     wx.getSavedFileList({
-      success(res) {
+      success: (res) => {
         console.log('Saved files:', res.fileList);
-        // Display file list or use as needed
+
+        const fileNames = res.fileList.map(file => file.filePath);
+        this.setData({
+          info: 'ไฟล์ที่บันทึกไว้: ' + fileNames.join(', ')
+        });
       },
-      fail(error) {
+      fail: (error) => {
         console.log('Failed to get saved file list:', error);
         wx.showToast({
           title: 'ไม่สามารถดึงรายการไฟล์ได้',
@@ -576,6 +618,8 @@ Page({
       }
     });
   },
+
+
 
   chooseImage() {
     wx.chooseImage({
@@ -615,6 +659,21 @@ Page({
     } else {
       console.error('Failed to create worker');
     }
+  },
+  // ฟังก์ชันสำหรับการแสดงภาพในโหมดเต็มหน้าจอ
+  previewImage() {
+    const imageUrls = [
+      'https://www.sarakadee.com/blog/oneton/wp-content/uploads/2017/12/cat-cute-e1533862828469.jpg',
+      'https://s.isanook.com/wo/0/ud/46/231281/a.jpg?ip/crop/w670h402/q80/jpg',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHBsaenrlQWuS4zFo4cYGm0wUACu1suziTbA&s'
+    ];
+
+    const currentImageUrl = imageUrls[0];
+
+    wx.previewImage({
+      current: currentImageUrl,
+      urls: imageUrls
+    });
   }
 
 

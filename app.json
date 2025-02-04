@@ -3,7 +3,8 @@
         "pages/index/index",
         "pages/logs/logs",
         "pages/NewPage/newPage",
-        "pages/newPage2/newPage2"
+        "pages/newPage2/newPage2",
+        "pages/video/video"
     ],
     "style": "v2",
     "window": {
