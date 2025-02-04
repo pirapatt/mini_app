@@ -27,6 +27,34 @@ Page({
       { label: 'GetStroage', action: 'getStorageData' },
       { label: 'ClearStroage', action: 'clearStorageData' },
       { label: 'ReportEvent', action: 'reportEvent' },
+      { label: '', action: '' },
+      { label: '', action: '' },
+      { label: 'CreateOffscreenCanvas', action: '' },
+      { label: 'CreateCanvasContext', action: '' },
+      { label: 'CanvasToTempFilePath', action: '' },
+      { label: 'CreateWorker', action: '' },
+      { label: '', action: '' },
+      { label: '', action: '' },
+      { label: 'CreateVideoContext', action: '' },
+      { label: 'StartRecord', action: '' },
+      { label: 'ChooseImage', action: '' },
+      { label: 'CreateSelectorQuery', action: '' },
+      { label: 'CreateIntersectionObserver', action: '' },
+      { label: 'NodesRef', action: '' },
+      { label: 'SaveFile', action: '' },
+      { label: 'OpenDocumen', action: '' },
+      { label: 'GetSavedFileList', action: '' },
+      { label: 'ScanCode', action: 'scanQRCode' },
+      { label: '', action: '' },
+      { label: '', action: '' },
+      { label: 'GetLocation', action: 'getCurrentLocation' },
+      { label: 'ChooseLocation', action: 'chooseLocation' },
+      { label: 'OpenLocation', action: 'openLocation' },
+      { label: 'Login', action: '' },
+      { label: 'CheckSession', action: '' },
+      { label: 'GetUserProfile', action: '' },
+      { label: 'SndWebviewEvent', action: '' },
+
     ],
     visibleButtons: []         // ปุ่มที่จะแสดงในหน้า
   },
@@ -105,7 +133,6 @@ Page({
       }
     });
   },
-
   //🔄 ฟังก์ชันสำหรับตรวจสอบว่ามีการอัปเดตแอปเวอร์ชันใหม่หรือไม่
   getUpdateManager() {
     const updateManager = wx.getUpdateManager();
@@ -439,5 +466,71 @@ Page({
     });
   },
 
+  getCurrentLocation() {
+    wx.getLocation({
+      type: 'wgs84',
+      success: (res) => {
+        const latitude = res.latitude;
+        const longitude = res.longitude;
+        console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+        this.setData({ info: `Latitude: ${latitude}, Longitude: ${longitude}` });
+      },
+      fail: () => {
+        wx.showToast({
+          title: 'Failed to get location',
+          icon: 'error',
+        });
+      }
+    });
+  },
 
+  // ฟังก์ชันสำหรับเลือกตำแหน่งจากแผนที่
+  chooseLocation() {
+    wx.chooseLocation({
+      success: (res) => {
+        const name = res.name;
+        const address = res.address;
+        const latitude = res.latitude;
+        const longitude = res.longitude;
+
+        console.log(`Location chosen: ${name}, Address: ${address}`);
+        this.setData({ info: `Location: ${name}, Address: ${address}, Latitude: ${latitude}, Longitude: ${longitude}` });
+      },
+      fail: () => {
+        wx.showToast({
+          title: 'Failed to choose location',
+          icon: 'error',
+        });
+      }
+    });
+  },
+
+  // ฟังก์ชันสำหรับเปิดตำแหน่งในแผนที่
+  openLocation() {
+    const latitude = 13.7102;
+    const longitude = 100.433;
+    const name = 'Example';
+    const address = '22/44';
+
+    wx.openLocation({
+      latitude,
+      longitude,
+      name,
+      address,
+      scale: 18
+    });
+
+    this.setData({ info: `Opening Location: ${name}, Address: ${address}, Latitude: ${latitude}, Longitude: ${longitude}` });
+  },
+
+  scanQRCode() {
+    wx.scanCode({
+      success: (res) => {
+        this.setData({ info: 'สแกน QR Code สำเร็จ' });
+      },
+      fail: (err) => {
+        this.setData({ info: 'สแกน QR Code ไม่สำเร็จ' });
+      }
+    });
+  }
 });
