@@ -1,11 +1,9 @@
 <view class="container">
   <text>{{title}}</text>
   <!-- แสดงปุ่มในหน้าปัจจุบัน -->
-  
+
   <block wx:for="{{visibleButtons}}" wx:key="index">
-    <button bindtap="handleButtonTap" data-action="{{item.action}}" class="btn">
-      {{item.label}}
-    </button>
+    <button bindtap="handleButtonTap" data-action="{{item.action}}" class="btn">{{item.label}}</button>
   </block>
 
   <!-- ปุ่มควบคุมการเปลี่ยนหน้า -->
@@ -13,10 +11,13 @@
     <button bindtap="prevPage" class="nav-btn" wx:if="{{currentPage > 0}}">Previous</button>
     <button bindtap="nextPage" class="nav-btn" wx:if="{{(currentPage + 1) * buttonsPerPage < allButtons.length}}">Next</button>
   </view>
+  <view>
+    <button class="c-btn" bindtap="clearData">Clear</button>
+  </view>
 
   <!-- กล่องแสดงผลข้อมูล -->
   <view class="info-box">
     <text>{{info}}</text>
-    <image src="{{imagePath}}" mode="aspectFit" style="width: 300px; height: 200px;" />
+    <image src="{{imagePath}}" mode="aspectFit" style="width: 300px; height: 200px" />
   </view>
 </view>

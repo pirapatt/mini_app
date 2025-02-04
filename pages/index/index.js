@@ -54,10 +54,10 @@ Page({
       { label: 'GetLocation', action: 'getCurrentLocation' },
       { label: 'ChooseLocation', action: 'chooseLocation' },
       { label: 'OpenLocation', action: 'openLocation' },
-      { label: 'Login', action: '' },
+      { label: 'Login', action: 'login' },
       { label: 'CheckSession', action: '' },
       { label: 'GetUserProfile', action: '' },
-      { label: 'SndWebviewEvent', action: '' },
+      { label: 'SendWebviewEvent', action: 'navigateToWebview' },
 
     ],
     visibleButtons: []         // ปุ่มที่จะแสดงในหน้า
@@ -100,12 +100,33 @@ Page({
     this.setData({ visibleButtons, title });  // อัปเดตข้อมูลสำหรับแสดงผล
   },
 
+   clearData: function() {
+    this.setData({
+      info: '',
+      imagePath: ''
+    });
+    console.log('Data cleared:', this.data.myData); // แสดงข้อความเมื่อเคลียร์ข้อมูล
+  },
+
   // ฟังก์ชันเรียกใช้งานเมื่อกดปุ่ม
   handleButtonTap(e) {
     const action = e.currentTarget.dataset.action;
     if (this[action]) {
       this[action]();
     }
+  },
+
+  navigateToWebview() {
+    // ใช้ wx.navigateTo เพื่อไปยังหน้าใหม่
+    wx.navigateTo({
+      url: '/pages/webview/webview',
+      success: function () {
+        console.log('Navigation successful');
+      },
+      fail: function () {
+        console.log('Navigation failed');
+      }
+    });
   },
 
   // ฟังก์ชันสำหรับเปลี่ยนหน้า (Next)
@@ -215,12 +236,12 @@ Page({
 
   handleNavigateToMiniProgram() {
     wx.navigateToMiniProgram({
-      appId: 'test_video',  // ใส่ appId ของ Mini Program ที่ต้องการนำทางไป
-      path: 'pages/index/index',  // ระบุ path ถ้าต้องการไปยังหน้าที่เฉพาะ
+      appId: 'test_video',
+      path: 'pages/index/index',
       extraData: {
-        key: 'value'  // ข้อมูลเพิ่มเติมที่ต้องการส่งไป
+        key: 'value'
       },
-      envVersion: 'release',  // สามารถเลือกสภาพแวดล้อม ('release', 'develop', 'trial')
+      envVersion: 'release',
       success: () => {
         console.log('Navigated to Mini Program successfully');
       },
@@ -232,7 +253,7 @@ Page({
   // Show Share Menu
   showShareMenu() {
     wx.showShareMenu({
-      menus: ['shareAppMessage', 'shareTimeline'],  // ตัวเลือกการแชร์ที่ต้องการ
+      menus: ['shareAppMessage', 'shareTimeline'],
       success() {
         console.log('Share menu shown successfully');
       },
@@ -244,7 +265,7 @@ Page({
 
   updateShareMenu() {
     wx.updateShareMenu({
-      withShareTicket: true,  // ถ้าต้องการให้สามารถแชร์โดยใช้ shareTicket
+      withShareTicket: true,
       success() {
         console.log('Share menu updated');
       },
@@ -258,11 +279,10 @@ Page({
   // Show Loading
   showLoding() {
     wx.showLoading({
-      title: 'กำลังโหลด...',  // ข้อความที่จะแสดงในหน้าจอโหลด
-      mask: true,              // ให้มีพื้นหลังมืดทับเหนือ UI เพื่อป้องกันการคลิก
+      title: 'กำลังโหลด...',
+      mask: true,
     });
 
-    // รอ 4 วินาทีแล้วซ่อนหน้าจอโหลด
     setTimeout(() => {
       wx.hideLoading();
       console.log('โหลดเสร็จแล้ว');
@@ -274,11 +294,11 @@ Page({
   // Show Modal
   showModal() {
     wx.showModal({
-      title: 'คำเตือน',             // หัวข้อของ Modal
-      content: 'คุณต้องการดำเนินการนี้หรือไม่?',  // ข้อความใน Modal
-      showCancel: true,             // การแสดงปุ่ม Cancel
-      cancelText: 'ยกเลิก',        // ข้อความปุ่ม Cancel
-      confirmText: 'ยืนยัน',       // ข้อความปุ่ม Confirm
+      title: 'คำเตือน',
+      content: 'คุณต้องการดำเนินการนี้หรือไม่?',
+      showCancel: true,
+      cancelText: 'ยกเลิก',
+      confirmText: 'ยืนยัน',
       success(res) {
         if (res.confirm) {
           console.log('ผู้ใช้เลือกยืนยัน');
@@ -295,9 +315,9 @@ Page({
   // Show Toast
   showToast() {
     wx.showToast({
-      title: 'สำเร็จ',          // ข้อความที่จะแสดงใน Toast
-      icon: 'success',          // ประเภทของไอคอน (success, loading, error)
-      duration: 2000,           // ระยะเวลาที่ Toast จะแสดง (ในมิลลิวินาที)
+      title: 'สำเร็จ',
+      icon: 'success',
+      duration: 2000,
       success() {
         console.log('Toast แสดงผลสำเร็จ');
       },
@@ -690,9 +710,30 @@ Page({
       current: currentImageUrl,
       urls: imageUrls
     });
+  },
+
+  login() {
+    wx.login({
+      success: (res) => {
+        if (res.code) {
+          console.log('Login code:', res.code);
+          // ส่ง code ไปยัง server ของคุณ (สำหรับทดสอบระบบ login)
+          wx.request({
+            url: 'https://yourserver.com/login',  // URL สำหรับทดสอบ login API
+            method: 'POST',
+            data: { code: res.code },
+            success: (response) => {
+              console.log('Server response:', response.data);
+            },
+            fail: (error) => {
+              console.error('Request failed:', error);
+            },
+          });
+        } else {
+          console.log('Login failed:', res.errMsg);
+        }
+      },
+    });
   }
-
-
-
 
 });
