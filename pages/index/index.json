@@ -1,5 +1,4 @@
 {
-  "usingComponents": {
-    
-  }
+  "navigationBarTitleText": "My Page",
+  "enableShareAppMessage": true  // ตั้งค่าการแชร์สำหรับแต่ละหน้าที่ต้องการ
 }

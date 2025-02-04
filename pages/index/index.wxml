@@ -17,5 +17,6 @@
   <!-- กล่องแสดงผลข้อมูล -->
   <view class="info-box">
     <text>{{info}}</text>
+    <image src="{{imagePath}}" mode="aspectFit" style="width: 300px; height: 200px;" />
   </view>
 </view>

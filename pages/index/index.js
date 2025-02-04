@@ -1,5 +1,6 @@
 Page({
   data: {
+    imagePath: '',
     info: '',                  // ข้อมูลแสดงผล
     currentPage: 0,            // หน้าเริ่มต้น
     buttonsPerPage: 3,         // จำนวนปุ่มต่อหน้า
@@ -32,18 +33,18 @@ Page({
       { label: 'CreateOffscreenCanvas', action: '' },
       { label: 'CreateCanvasContext', action: '' },
       { label: 'CanvasToTempFilePath', action: '' },
-      { label: 'CreateWorker', action: '' },
+      { label: 'CreateWorker', action: 'createWorkerFunction' },
       { label: '', action: '' },
       { label: '', action: '' },
       { label: 'CreateVideoContext', action: '' },
       { label: 'StartRecord', action: '' },
-      { label: 'ChooseImage', action: '' },
+      { label: 'ChooseImage', action: 'chooseImage' },
       { label: 'CreateSelectorQuery', action: '' },
       { label: 'CreateIntersectionObserver', action: '' },
       { label: 'NodesRef', action: '' },
-      { label: 'SaveFile', action: '' },
-      { label: 'OpenDocumen', action: '' },
-      { label: 'GetSavedFileList', action: '' },
+      { label: 'SaveFile', action: 'saveFile' },
+      { label: 'OpenDocument', action: 'openDocument' },
+      { label: 'GetSavedFileList', action: 'getSavedFileList' },
       { label: 'ScanCode', action: 'scanQRCode' },
       { label: '', action: '' },
       { label: '', action: '' },
@@ -283,13 +284,13 @@ Page({
   uploadFile() {
     wx.chooseImage({
       success(res) {
-        const filePath = res.tempFilePaths[0];  // เลือกไฟล์จากแกลเลอรี
+        const filePath = res.tempFilePaths[0];
         wx.uploadFile({
-          url: 'https://your-server-url.com/upload',  // URL ของเซิร์ฟเวอร์ที่ต้องการอัปโหลดไฟล์
+          url: 'http://localhost:8080/upload',
           filePath: filePath,
-          name: 'file',  // ชื่อฟิลด์ที่ส่งไปยังเซิร์ฟเวอร์
+          name: 'file',
           formData: {
-            'user': 'test'  // ส่งข้อมูลเพิ่มเติมได้ เช่น token หรือข้อมูลอื่น ๆ
+            'user': 'test'
           },
           success(uploadRes) {
             console.log('Upload success:', uploadRes);
@@ -319,7 +320,7 @@ Page({
   // Connect Socket
   connectSocket() {
     const socket = wx.connectSocket({
-      url: 'wss://your-server-url.com/socket',  // URL ของ WebSocket server
+      url: 'wss://echo.websocket.org',
       success() {
         console.log('WebSocket connected');
         wx.showToast({
@@ -340,7 +341,7 @@ Page({
     socket.onOpen(() => {
       console.log('WebSocket เปิดการเชื่อมต่อ');
       socket.send({
-        data: 'Hello, Server!'  // ส่งข้อมูลไปยังเซิร์ฟเวอร์
+        data: 'Hello, Server!'
       });
     });
 
@@ -362,21 +363,13 @@ Page({
   // Download File
   downloadFile() {
     wx.downloadFile({
-      url: 'http://localhost:8080/download/The2024.pdf',  // URL ของไฟล์ที่ต้องการดาวน์โหลด
-      success(res) {
+      url: 'http://localhost:8080/download/The2024.pdf',
+      success: (res) => {
         if (res.statusCode === 200) {
           const tempFilePath = res.tempFilePath;
           console.log('ดาวน์โหลดไฟล์สำเร็จ:', tempFilePath);
-
-          // เปิดไฟล์หลังจากดาวน์โหลดเสร็จ
-          wx.openDocument({
-            filePath: tempFilePath,
-            success() {
-              console.log('เปิดไฟล์สำเร็จ');
-            },
-            fail(error) {
-              console.log('ไม่สามารถเปิดไฟล์:', error);
-            }
+          this.setData({
+            info: 'ดาวน์โหลดไฟล์สำเร็จ: ' + tempFilePath
           });
         } else {
           wx.showToast({
@@ -385,7 +378,7 @@ Page({
           });
         }
       },
-      fail(error) {
+      fail: (error) => {
         console.log('ดาวน์โหลดล้มเหลว:', error);
         wx.showToast({
           title: 'ดาวน์โหลดล้มเหลว',
@@ -398,11 +391,10 @@ Page({
   // 📥 ฟังก์ชันสำหรับเก็บข้อมูลใน Storage
   setStorageData() {
     try {
-      wx.setStorageSync('username', 'pirapat');  // จัดเก็บข้อมูล
-      // ดึงข้อมูลที่เก็บล่าสุดมาแสดง
+      wx.setStorageSync('username', 'pirapat');
       const storedData = wx.getStorageSync('username');
       this.setData({
-        info: `✅ ข้อมูลถูกจัดเก็บเรียบร้อย! ข้อมูลที่จัดเก็บ: ${storedData}` // แสดงข้อมูลที่เก็บ
+        info: `✅ ข้อมูลถูกจัดเก็บเรียบร้อย! ข้อมูลที่จัดเก็บ: ${storedData}`
       });
     } catch (e) {
       this.setData({ info: '❌ เกิดข้อผิดพลาดในการจัดเก็บข้อมูล' });
@@ -430,7 +422,7 @@ Page({
   },
 
   onCopyUrl() {
-    const url = 'https://yourwebsite2222.com'; // กำหนด URL ที่คุณต้องการคัดลอก
+    const url = 'https://yourwebsite2222.com';
     wx.onCopyUrl({
       data: url,  // ข้อมูลที่จะคัดลอก
       success() {
@@ -532,5 +524,100 @@ Page({
         this.setData({ info: 'สแกน QR Code ไม่สำเร็จ' });
       }
     });
+  },
+
+  saveFile() {
+    wx.saveFile({
+      tempFilePath: '/tmp/mp4s17v6ok9b3f8c..cb4QMoFMnor020b562cbb2aa52eb2310e9e824f628ed.pdf',  // Path to the temporary file
+      success(res) {
+        console.log('File saved successfully:', res.savedFilePath);
+        wx.showToast({
+          title: 'บันทึกไฟล์สำเร็จ',
+          icon: 'success',
+        });
+      },
+      fail(error) {
+        console.log('Failed to save file:', error);
+        wx.showToast({
+          title: 'บันทึกไฟล์ล้มเหลว',
+          icon: 'error',
+        });
+      }
+    });
+  },
+
+  openDocument() {
+    wx.openDocument({
+      filePath: '/path/to/your/saved/file',  // Path to the saved document
+      success() {
+        console.log('Document opened successfully');
+      },
+      fail(error) {
+        console.log('Failed to open document:', error);
+        wx.showToast({
+          title: 'เปิดเอกสารล้มเหลว',
+          icon: 'error',
+        });
+      }
+    });
+  },
+  getSavedFileList() {
+    wx.getSavedFileList({
+      success(res) {
+        console.log('Saved files:', res.fileList);
+        // Display file list or use as needed
+      },
+      fail(error) {
+        console.log('Failed to get saved file list:', error);
+        wx.showToast({
+          title: 'ไม่สามารถดึงรายการไฟล์ได้',
+          icon: 'error',
+        });
+      }
+    });
+  },
+
+  chooseImage() {
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        console.log('เลือกภาพสำเร็จ:', res.tempFilePaths);
+        this.setData({
+          imagePath: res.tempFilePaths[0]
+        });
+      },
+      fail: (error) => {
+        console.log('เลือกภาพล้มเหลว:', error);
+        wx.showToast({
+          title: 'เลือกภาพล้มเหลว',
+          icon: 'error',
+        });
+      }
+    });
+  },
+
+  createWorkerFunction() {
+    const worker = wx.createWorker('workers/worker.js');
+
+    if (worker) {
+      // ส่งข้อความไปยัง worker
+      worker.postMessage({
+        action: 'start',
+        data: 'Hello from main thread!',
+      });
+
+      // ฟังการตอบกลับจาก worker
+      worker.onMessage((msg) => {
+        console.log('Received from worker:', msg.data);
+      });
+    } else {
+      console.error('Failed to create worker');
+    }
   }
+
+
+
+
 });
