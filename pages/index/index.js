@@ -10,14 +10,15 @@ Page({
       { label: 'Get UpdateManager', action: 'getUpdateManager' },
       { label: 'Get LaunchOptionsSync', action: 'getLaunchOptionsSync' },
       { label: 'NavigateTo', action: 'navigateTo' },
-      { label: 'NavigateBack', action: '' },
+      { label: '', action: '' },
       { label: 'EventChanel', action: 'handleEventChanelTap' },
       { label: 'ExitMiniProgram', action: 'handleExitMiniProgram' },
       { label: 'NavigateToMiniProgram', action: 'handleNavigateToMiniProgram' },
       { label: 'NavigateBackMiniProgram', action: '' },
-      { label: 'ShowShareMenu', action: 'showShareMenu' },
-      { label: 'UpdateShareMenu', action: 'updateShareMenu' },
-      { label: 'OnCopyUrl', action: 'onCopyUrl' },
+      { label: 'ShowShareMenu & OnCopyUrl', action: 'showShareMenu' },
+      { label: '', action: '' },
+      // { label: 'OnCopyUrl', action: 'copyLink' },
+      { label: '', action: '' },
       { label: 'ShowLoding', action: 'showLoding' },
       { label: 'ShowModal', action: 'showModal' },
       { label: 'ShowToast', action: 'showToast' },
@@ -36,15 +37,15 @@ Page({
       // { label: 'CreateOffscreenCanvas', action: '' },
       // { label: 'CreateCanvasContext', action: '' },
       // { label: 'CanvasToTempFilePath', action: '' },
-      { label: 'CreateWorker', action: 'createWorkerFunction' },
+      { label: 'CreateWorker', action: 'createWorker' },
       { label: '', action: '' },
       { label: '', action: '' },
       { label: 'CreateVideoContext', action: 'navigateToVideoContext' },
       { label: 'PreviewImage', action: 'previewImage' },
       { label: 'ChooseImage', action: 'chooseImage' },
-      { label: 'CreateSelectorQuery', action: '' },
-      { label: 'CreateIntersectionObserver', action: '' },
-      { label: 'NodesRef', action: '' },
+      { label: 'Go To WXML', action: 'navigateToWxml' },
+      { label: '', action: '' },
+      { label: '', action: '' },
       { label: 'SaveFile & OpenDocument', action: 'saveFile' },
       { label: '', action: '' },
       { label: 'GetSavedFileList', action: 'getSavedFileList' },
@@ -60,11 +61,14 @@ Page({
       { label: 'SendWebviewEvent', action: 'navigateToWebview' },
 
     ],
-    visibleButtons: []         // ปุ่มที่จะแสดงในหน้า
+    visibleButtons: []
   },
 
   onLoad() {
-    this.updateVisibleButtons();  // โหลดปุ่มสำหรับหน้าแรก
+    this.updateVisibleButtons();
+    wx.onCopyUrl(() => {
+      return { query: 'a=1&b=2' }
+    })
   },
 
   // ฟังก์ชันอัปเดตปุ่มที่แสดง
@@ -72,7 +76,7 @@ Page({
     const { currentPage, buttonsPerPage, allButtons } = this.data;
     const start = currentPage * buttonsPerPage;
     const end = start + buttonsPerPage;
-    const visibleButtons = allButtons.slice(start, end);  // ตัดแบ่งรายการปุ่มตามหน้า
+    const visibleButtons = allButtons.slice(start, end);
 
     // กำหนด title สำหรับหน้า
     const pageTitles = [
@@ -95,17 +99,17 @@ Page({
       '19. H5 Real-Time Communication',
     ];
 
-    const title = pageTitles[currentPage] || `Page ${currentPage + 1}`;  // อัปเดตชื่อหัวข้อให้ตามหน้าที่แสดง
+    const title = pageTitles[currentPage] || `Page ${currentPage + 1}`;
 
-    this.setData({ visibleButtons, title });  // อัปเดตข้อมูลสำหรับแสดงผล
+    this.setData({ visibleButtons, title });
   },
 
-   clearData: function() {
+  clearData: function () {
     this.setData({
       info: '',
       imagePath: ''
     });
-    console.log('Data cleared:', this.data.myData); // แสดงข้อความเมื่อเคลียร์ข้อมูล
+    console.log('Data cleared:', this.data.myData);
   },
 
   // ฟังก์ชันเรียกใช้งานเมื่อกดปุ่ม
@@ -114,6 +118,19 @@ Page({
     if (this[action]) {
       this[action]();
     }
+  },
+
+  navigateToWxml() {
+    // ใช้ wx.navigateTo เพื่อไปยังหน้าใหม่
+    wx.navigateTo({
+      url: '/pages/wxml/wxml',
+      success: function () {
+        console.log('Navigation successful');
+      },
+      fail: function () {
+        console.log('Navigation failed');
+      }
+    });
   },
 
   navigateToWebview() {
@@ -132,10 +149,15 @@ Page({
   // ฟังก์ชันสำหรับเปลี่ยนหน้า (Next)
   nextPage() {
     const { currentPage, buttonsPerPage, allButtons } = this.data;
+    console.log('Before page change:', currentPage);
+
     if ((currentPage + 1) * buttonsPerPage < allButtons.length) {
       this.setData(
         { currentPage: currentPage + 1 },
-        () => this.updateVisibleButtons()   // เรียกอัปเดตปุ่มหลังเปลี่ยนหน้า
+        () => {
+          console.log('After page change:', this.data.currentPage);
+          this.updateVisibleButtons();   // เรียกอัปเดตปุ่มหลังเปลี่ยนหน้า
+        }
       );
     }
   },
@@ -236,7 +258,7 @@ Page({
 
   handleNavigateToMiniProgram() {
     wx.navigateToMiniProgram({
-      appId: 'test_video',
+      appId: 'mptiw78wqqx65b30',
       path: 'pages/index/index',
       extraData: {
         key: 'value'
@@ -255,6 +277,10 @@ Page({
     wx.showShareMenu({
       menus: ['shareAppMessage', 'shareTimeline'],
       success() {
+        wx.showToast({
+              title: 'เปิดเมนูการแชร์',
+              icon: 'success',
+            });
         console.log('Share menu shown successfully');
       },
       fail() {
@@ -263,18 +289,18 @@ Page({
     });
   },
 
-  updateShareMenu() {
-    wx.updateShareMenu({
-      withShareTicket: true,
-      success() {
-        console.log('Share menu updated');
-      },
-      fail() {
-        console.log('Failed to update share menu');
-      }
-    });
+  // updateShareMenu() {
+  //   wx.updateShareMenu({
+  //     withShareTicket: true,
+  //     success() {
+  //       console.log('Share menu updated');
+  //     },
+  //     fail() {
+  //       console.log('Failed to update share menu');
+  //     }
+  //   });
 
-  },
+  // },
 
   // Show Loading
   showLoding() {
@@ -469,30 +495,11 @@ Page({
     }
   },
 
-  onCopyUrl() {
-    const url = 'https://yourwebsite2222.com';
-    wx.onCopyUrl({
-      data: url,  // ข้อมูลที่จะคัดลอก
-      success() {
-        wx.showToast({
-          title: 'URL ได้ถูกคัดลอกแล้ว!',
-          icon: 'success',
-        });
-      },
-      fail() {
-        wx.showToast({
-          title: 'ไม่สามารถคัดลอกได้',
-          icon: 'error',
-        });
-      }
-    });
-  },
-
   reportEvent() {
     // รายงานเหตุการณ์ 'purchase_button_click'
     wx.reportEvent({
       event: 'purchase_button_click',  // ชื่อของเหตุการณ์
-      params: {
+      params: {  // พารามิเตอร์ข้อมูลที่จะส่ง
         item_id: '12345',  // ไอดีของสินค้าที่ถูกคลิก
         price: 100,        // ราคาสินค้า
         user_id: 'user123' // ไอดีผู้ใช้
@@ -505,6 +512,7 @@ Page({
       icon: 'success'
     });
   },
+
 
   getCurrentLocation() {
     wx.getLocation({
@@ -678,24 +686,69 @@ Page({
     });
   },
 
-  createWorkerFunction() {
-    const worker = wx.createWorker('workers/worker.js');
+  createWorker() {
+    try {
+      const worker = wx.createWorker('workers/workers.js'); // ตรวจสอบชื่อไฟล์ให้ถูกต้อง
 
-    if (worker) {
-      // ส่งข้อความไปยัง worker
-      worker.postMessage({
-        action: 'start',
-        data: 'Hello from main thread!',
-      });
+      if (worker) {
+        console.log('✅ Worker Created Successfully');
 
-      // ฟังการตอบกลับจาก worker
-      worker.onMessage((msg) => {
-        console.log('Received from worker:', msg.data);
+        const messageToSend = 'Hello from main thread!';
+
+        // 📤 ส่งข้อความไปยัง Worker
+        worker.postMessage({
+          action: 'start',
+          data: messageToSend
+        });
+
+        // ✅ อัปเดต info สำหรับข้อความที่ส่ง
+        this.setData({
+          info: `📤 Sent: ${messageToSend}`
+        });
+
+        // 📩 รับข้อความตอบกลับจาก Worker
+        worker.onMessage((msg) => {
+          console.log('📥 Received from Worker:', msg.data);
+
+          // ✅ เพิ่มข้อความที่ได้รับลงใน info
+          this.setData({
+            info: `${this.data.info}\n📥 Received: ${msg.data}`
+          });
+
+          wx.showToast({
+            title: `Reply: ${msg.data}`,
+            icon: 'success'
+          });
+        });
+
+        // เก็บ worker ไว้ใช้งานภายหลัง
+        this.worker = worker;
+      } else {
+        throw new Error('Failed to create worker');
+      }
+    } catch (error) {
+      console.error('❗ Error:', error.message);
+      wx.showToast({
+        title: 'Worker Error',
+        icon: 'error'
       });
-    } else {
-      console.error('Failed to create worker');
     }
   },
+
+  // ❌ ฟังก์ชันหยุดการทำงานของ Worker
+  terminateWorker() {
+    if (this.worker) {
+      this.worker.terminate();
+      console.log('❌ Worker Terminated');
+      wx.showToast({
+        title: 'Worker Terminated',
+        icon: 'none'
+      });
+      this.worker = null;
+    }
+  },
+
+
   // ฟังก์ชันสำหรับการแสดงภาพในโหมดเต็มหน้าจอ
   previewImage() {
     const imageUrls = [
@@ -716,24 +769,77 @@ Page({
     wx.login({
       success: (res) => {
         if (res.code) {
-          console.log('Login code:', res.code);
-          // ส่ง code ไปยัง server ของคุณ (สำหรับทดสอบระบบ login)
+          console.log('✅ Login code:', res.code);
+
           wx.request({
-            url: 'https://yourserver.com/login',  // URL สำหรับทดสอบ login API
+            url: 'http://localhost:8080/login',
             method: 'POST',
-            data: { code: res.code },
-            success: (response) => {
-              console.log('Server response:', response.data);
+            header: {
+              'Content-Type': 'application/json',
             },
+            data: { code: res.code },
+
+            success: (response) => {
+              console.log('🎯 Server response:', response.data);
+
+              if (response.data && response.data.openid) {
+                wx.showToast({
+                  title: '🎉 Login Success!',
+                  icon: 'success',
+                });
+                this.setData({
+                  userInfo: response.data,
+                });
+              } else {
+                wx.showToast({
+                  title: '⚠️ Login Failed',
+                  icon: 'none',
+                });
+                console.error('❗ Invalid response:', response.data);
+              }
+            },
+
             fail: (error) => {
-              console.error('Request failed:', error);
+              console.error('❌ Request failed:', error);
+              wx.showToast({
+                title: 'Network Error',
+                icon: 'error',
+              });
             },
           });
         } else {
-          console.log('Login failed:', res.errMsg);
+          console.log('❗ Login failed:', res.errMsg);
+          wx.showToast({
+            title: 'Login Failed',
+            icon: 'none',
+          });
         }
       },
-    });
-  }
 
+      fail: (err) => {
+        console.error('❌ wx.login failed:', err);
+        wx.showToast({
+          title: 'Login Error',
+          icon: 'error',
+        });
+      },
+    });
+  },
+
+  copyLink() {
+    // ตรวจสอบ URL ที่ถูกคัดลอก
+    wx.getClipboardData({
+
+      success: (res) => {
+        console.log('Clipboard content:', res.data);  // แสดงข้อมูลที่ถูกคัดลอก
+        this.setData({
+          copiedUrl: res.data,
+        });
+        wx.showToast({
+          title: 'Link copied!',
+          icon: 'none',
+        });
+      },
+    });
+  },
 });
