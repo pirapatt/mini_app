@@ -1,33 +1,34 @@
 Page({
   data: {
-    showWebview: true,  // เริ่มต้นไม่แสดง WebView
-    url: 'https://bridge-ap-is-git-main-pirapats-projects.vercel.app/',  // URL ที่จะให้โหลดใน WebView
+    showWebView: false, // ซ่อน WebView ตอนแรก
   },
 
   onLoad() {
     console.log('Page is loaded');
   },
 
-  // ฟังก์ชันส่งข้อความไปยัง WebView
-  sendToWebview() {
-    if (this.data.showWebview) {
-      wx.sendWebviewEvent({
-        message: "I'm MiniProgram, I received"
-      });
+  // กดปุ่มเพื่อแสดง WebView
+  showWebview() {
+    this.setData({ showWebView: true });
+  },
+
+  // ส่งข้อความไปยัง WebView
+  sendDataToWebview() {
+    wx.sendWebviewEvent({
+      event: 'userClickedButton',
+      data: {
+        message: 'Hello from Mini Program!',
+        userId: 12345
+      }
+    });
+  },
+
+  // รับข้อความจาก WebView
+  onMessageFromWebview(e) {
+    if (e.detail && e.detail.data && e.detail.data.length > 0) {
+      console.log('Received message from WebView:', e.detail.data[0]);
     } else {
-      console.log('WebView is not visible.');
+      console.log('Received empty message from WebView');
     }
   },
-
-  // ฟังก์ชันรับข้อความจาก WebView
-  onMessageFromWebview(e) {
-    console.log('Received message from WebView:', e.detail);
-  },
-
-  // ฟังก์ชันที่ใช้เปิด WebView
-  toggleWebview() {
-    this.setData({
-      showWebview: !this.data.showWebview  // สลับการแสดง WebView
-    });
-  }
 });

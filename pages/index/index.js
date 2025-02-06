@@ -59,7 +59,6 @@ Page({
       { label: 'CheckSession', action: '' },
       { label: 'GetUserProfile', action: '' },
       { label: 'SendWebviewEvent', action: 'navigateToWebview' },
-
     ],
     visibleButtons: []
   },
@@ -156,7 +155,7 @@ Page({
         { currentPage: currentPage + 1 },
         () => {
           console.log('After page change:', this.data.currentPage);
-          this.updateVisibleButtons();   // เรียกอัปเดตปุ่มหลังเปลี่ยนหน้า
+          this.updateVisibleButtons();
         }
       );
     }
@@ -167,7 +166,7 @@ Page({
     if (this.data.currentPage > 0) {
       this.setData(
         { currentPage: this.data.currentPage - 1 },
-        () => this.updateVisibleButtons()   // เรียกอัปเดตปุ่มหลังเปลี่ยนหน้า
+        () => this.updateVisibleButtons()
       );
     }
   },
@@ -183,19 +182,44 @@ Page({
   //🔄 ฟังก์ชันสำหรับตรวจสอบว่ามีการอัปเดตแอปเวอร์ชันใหม่หรือไม่
   getUpdateManager() {
     const updateManager = wx.getUpdateManager();
+
+    // ตรวจสอบการอัปเดต
     updateManager.onCheckForUpdate((res) => {
+      console.log('Has update:', res.hasUpdate);  // ตรวจสอบว่ามีอัปเดตหรือไม่
       this.setData({ info: 'Has Update: ' + res.hasUpdate });
+    });
+
+    // หากมีการอัปเดต, ทำการดาวน์โหลดและติดตั้ง
+    updateManager.onUpdateReady(() => {
+      wx.showModal({
+        title: 'Update Available',
+        content: 'A new update is available. Do you want to restart?',
+        success(res) {
+          if (res.confirm) {
+            // รีสตาร์ทแอปเพื่อใช้การอัปเดต
+            updateManager.applyUpdate();
+          }
+        }
+      });
+    });
+
+    // หากไม่สามารถดาวน์โหลดการอัปเดต, แสดงข้อผิดพลาด
+    updateManager.onUpdateFailed(() => {
+      wx.showModal({
+        title: 'Update Failed',
+        content: 'There was an error while updating the app.',
+        showCancel: false
+      });
     });
   },
 
-  //🚀 ฟังก์ชันสำหรับดึงข้อมูลการเปิดแอป เช่น วิธีที่ผู้ใช้เปิดแอป (ผ่าน QR Code, การแชร์, หรือปุ่มลัด)
+  //🚀 ฟังก์ชันสำหรับดึงข้อมูลการเปิดแอป เช่น วิธีที่ผู้ใช้เปิดแอป (ผ่าน QR Code, การแชร์,หรือปุ่มลัด)
   getLaunchOptionsSync() {
     const res = wx.getLaunchOptionsSync();
     this.setData({ info: JSON.stringify(res, null, 2) });
   },
 
   navigateTo() {
-    // ใช้ wx.navigateTo เพื่อไปยังหน้าใหม่
     wx.navigateTo({
       url: '/pages/NewPage/newPage',
       success: function () {
@@ -208,7 +232,6 @@ Page({
   },
 
   navigateToVideoContext() {
-    // ใช้ wx.navigateTo เพื่อไปยังหน้าใหม่
     wx.navigateTo({
       url: '/pages/video/video',
       success: function () {
@@ -221,7 +244,6 @@ Page({
   },
 
   navigateToCanvas() {
-    // ใช้ wx.navigateTo เพื่อไปยังหน้าใหม่
     wx.navigateTo({
       url: '/pages/canvas/canvas',
       success: function () {
@@ -236,9 +258,8 @@ Page({
   // ฟังก์ชันเมื่อกดปุ่ม 'EventChanel'
   handleEventChanelTap() {
     wx.navigateTo({
-      url: '/pages/newPage2/newPage2',  // ไปยังหน้าที่ต้องการ
+      url: '/pages/newPage2/newPage2',
       success: (res) => {
-        // ใช้ EventChannel ในการส่งข้อมูล
         const eventChannel = res.eventChannel;
         eventChannel.emit('sendData', { message: 'Hello from first page! CCCCC' });
       }
@@ -275,12 +296,11 @@ Page({
   // Show Share Menu
   showShareMenu() {
     wx.showShareMenu({
-      menus: ['shareAppMessage', 'shareTimeline'],
       success() {
         wx.showToast({
-              title: 'เปิดเมนูการแชร์',
-              icon: 'success',
-            });
+          title: 'เปิดเมนูการแชร์ddd',
+          icon: 'success',
+        });
         console.log('Share menu shown successfully');
       },
       fail() {
@@ -496,13 +516,12 @@ Page({
   },
 
   reportEvent() {
-    // รายงานเหตุการณ์ 'purchase_button_click'
     wx.reportEvent({
-      event: 'purchase_button_click',  // ชื่อของเหตุการณ์
-      params: {  // พารามิเตอร์ข้อมูลที่จะส่ง
-        item_id: '12345',  // ไอดีของสินค้าที่ถูกคลิก
-        price: 100,        // ราคาสินค้า
-        user_id: 'user123' // ไอดีผู้ใช้
+      event: 'purchase_button_click',
+      params: {
+        item_id: '12345',
+        price: 100,
+        user_id: 'user123'
       }
     });
 
@@ -688,7 +707,7 @@ Page({
 
   createWorker() {
     try {
-      const worker = wx.createWorker('workers/workers.js'); // ตรวจสอบชื่อไฟล์ให้ถูกต้อง
+      const worker = wx.createWorker('workers/workers.js');
 
       if (worker) {
         console.log('✅ Worker Created Successfully');
@@ -827,11 +846,9 @@ Page({
   },
 
   copyLink() {
-    // ตรวจสอบ URL ที่ถูกคัดลอก
     wx.getClipboardData({
-
       success: (res) => {
-        console.log('Clipboard content:', res.data);  // แสดงข้อมูลที่ถูกคัดลอก
+        console.log('Clipboard content:', res.data);
         this.setData({
           copiedUrl: res.data,
         });

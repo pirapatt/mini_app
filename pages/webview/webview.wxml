@@ -1,11 +1,12 @@
-<view style="display: flex; flex-direction: column; height: 100%;">
-  <!-- ส่วนบน: แสดง WebView เมื่อ showWebview เป็น true -->
-  <view style="flex: 1; border: 2px solid #000000; border-radius: 10px; margin: 10px;">
-    <web-view src="{{url}}" bindmessage="onMessageFromWebview"></web-view>
-  </view>
+<view style="padding: 20px; text-align: center;">
+  <!-- ปุ่มแสดง WebView -->
+  <button bindtap="showWebview" style="margin-bottom: 20px;">Show WebView</button>
 
-  <!-- ส่วนล่าง: ปุ่มเพื่อส่งข้อความไปยัง WebView -->
-  <view style="padding: 10px;">
-    <button bindtap="sendToWebview">Send Message to WebView</button>
-  </view>
+  <!-- ปุ่มส่งข้อมูลไป WebView -->
+  <button bindtap="sendDataToWebview" style="margin-bottom: 20px;">Send Data to WebView</button>
+
+  <!-- WebView (ซ่อนอยู่จนกว่ากดปุ่ม) -->
+  <web-view wx:if="{{showWebView}}" src="https://bridge-ap-is-git-main-pirapats-projects.vercel.app/" 
+    style="height: 400px; width: 100%; border: 1px solid #ccc;">
+  </web-view>
 </view>
