@@ -1,12 +1,11 @@
-<view style="padding: 20px; text-align: center;">
-  <!-- ปุ่มแสดง WebView -->
-  <button bindtap="showWebview" style="margin-bottom: 20px;">Show WebView</button>
-
-  <!-- ปุ่มส่งข้อมูลไป WebView -->
-  <button bindtap="sendDataToWebview" style="margin-bottom: 20px;">Send Data to WebView</button>
-
-  <!-- WebView (ซ่อนอยู่จนกว่ากดปุ่ม) -->
-  <web-view wx:if="{{showWebView}}" src="https://bridge-ap-is-git-main-pirapats-projects.vercel.app/" 
-    style="height: 400px; width: 100%; border: 1px solid #ccc;">
-  </web-view>
+<view style="padding: 20px; border: 1px solid #ccc; width: 100%; max-width: 600px; margin: 0 auto; position: relative;">
+  <!-- ปุ่มส่งข้อมูลไปยัง WebView -->
+  <button bindtap="sendDataToWebview" 
+    style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 999; background-color: white;">
+    Send Data to WebView
+  </button>
+  
+  <!-- web-view ที่ฝังหน้า HTML -->
+  <web-view src="https://bridge-ap-is-git-main-pirapats-projects.vercel.app/" 
+    style="height: 400px; border: 1px solid #ccc; margin-top: 50px;"></web-view>
 </view>

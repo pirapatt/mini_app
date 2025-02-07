@@ -1,23 +1,26 @@
 <view class="container">
-  <text>{{title}}</text>
-  <!-- แสดงปุ่มในหน้าปัจจุบัน -->
+  <text class="title">{{title}}</text>
+  <!-- แสดงหมวดหมู่และปุ่มในแต่ละหมวด -->
+  <block wx:for="{{categorizedButtons}}" wx:key="category">
+    <view class="category">
+      <text class="category-title">{{item.category}}</text>
 
-  <block wx:for="{{visibleButtons}}" wx:key="index">
-    <button bindtap="handleButtonTap" data-action="{{item.action}}" class="btn">{{item.label}}</button>
+      <!-- วนลูปแสดงปุ่มในแต่ละหมวด -->
+      <block wx:for="{{item.buttons}}" wx:key="index">
+        <button bindtap="handleButtonTap" data-action="{{item.action}}" class="btn" title="{{item.label}}">
+        {{item.label}}
+        </button>
+      </block>
+    </view>
   </block>
 
-  <!-- ปุ่มควบคุมการเปลี่ยนหน้า -->
-  <view class="pagination">
-    <button bindtap="prevPage" class="nav-btn" wx:if="{{currentPage > 0}}">Previous</button>
-    <button bindtap="nextPage" class="nav-btn" wx:if="{{(currentPage + 1) * buttonsPerPage < allButtons.length}}">Next</button>
-  </view>
   <view>
     <button class="c-btn" bindtap="clearData">Clear</button>
   </view>
 
   <!-- กล่องแสดงผลข้อมูล -->
   <view class="info-box">
-    <text>{{info}}</text>
+    <text style="font-size: 20px;">{{info}}</text>
     <image src="{{imagePath}}" mode="aspectFit" style="width: 300px; height: 200px" />
   </view>
 </view>

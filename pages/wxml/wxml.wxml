@@ -1,4 +1,4 @@
-<view>
+<view style="center">
   <!-- กล่องแสดงผล -->
   <view id="box" style="width: 300px; height: 100px; background-color: lightblue">
     Hello, Mini Program!
@@ -10,16 +10,11 @@
   <!-- Custom Modal สำหรับแสดงข้อมูลขนาดและตำแหน่ง -->
   <view wx:if="{{showModal}}" class="custom-modal">
     <view class="modal-content">
-      <text>Width: {{boxInfo.width}} px</text>
-      <text>Height: {{boxInfo.height}} px</text>
-      <text>Top: {{boxInfo.top}} px</text>
+      <text>Width: {{boxInfo.width}} px\n</text>
+      <text>Height: {{boxInfo.height}} px\n</text>
+      <text>Top: {{boxInfo.top}} px\n</text>
       <text>Left: {{boxInfo.left}} px</text>
       <button bindtap="closeModal">Close</button>
     </view>
-  </view>
-
-  <!-- กล่องสำหรับแอนิเมชันเมื่อเลื่อนมาถึง -->
-  <view id="animatedBox" class="{{showAnimation ? 'animated' : ''}}">
-    🎉 Scroll to See Me!
   </view>
 </view>

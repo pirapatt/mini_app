@@ -1,15 +1,9 @@
 Page({
   data: {
-    showWebView: false, // ซ่อน WebView ตอนแรก
   },
 
   onLoad() {
     console.log('Page is loaded');
-  },
-
-  // กดปุ่มเพื่อแสดง WebView
-  showWebview() {
-    this.setData({ showWebView: true });
   },
 
   // ส่งข้อความไปยัง WebView

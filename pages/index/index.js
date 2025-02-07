@@ -1,106 +1,125 @@
+//รวมหน้าเดียว
+
 Page({
   data: {
     imagePath: '',
-    info: '',                  // ข้อมูลแสดงผล
-    currentPage: 0,            // หน้าเริ่มต้น
-    buttonsPerPage: 3,         // จำนวนปุ่มต่อหน้า
-    title: '',                 // หัวข้อหน้า
-    allButtons: [              // รายการปุ่มทั้งหมด
-      { label: 'Get SystemInfoSync', action: 'getSystemInfoSync' },
-      { label: 'Get UpdateManager', action: 'getUpdateManager' },
-      { label: 'Get LaunchOptionsSync', action: 'getLaunchOptionsSync' },
-      { label: 'NavigateTo', action: 'navigateTo' },
-      { label: '', action: '' },
-      { label: 'EventChanel', action: 'handleEventChanelTap' },
-      { label: 'ExitMiniProgram', action: 'handleExitMiniProgram' },
-      { label: 'NavigateToMiniProgram', action: 'handleNavigateToMiniProgram' },
-      { label: 'NavigateBackMiniProgram', action: '' },
-      { label: 'ShowShareMenu & OnCopyUrl', action: 'showShareMenu' },
-      { label: '', action: '' },
-      // { label: 'OnCopyUrl', action: 'copyLink' },
-      { label: '', action: '' },
-      { label: 'ShowLoding', action: 'showLoding' },
-      { label: 'ShowModal', action: 'showModal' },
-      { label: 'ShowToast', action: 'showToast' },
-      { label: 'UploadFile', action: 'uploadFile' },
-      { label: 'ConnectSocket', action: 'connectSocket' },
-      { label: 'DownloadFile', action: 'downloadFile' },
-      { label: 'SetStroageSync', action: 'setStorageData' },
-      { label: 'GetStroage', action: 'getStorageData' },
-      { label: 'ClearStroage', action: 'clearStorageData' },
-      { label: 'ReportEvent', action: 'reportEvent' },
-      { label: '', action: '' },
-      { label: '', action: '' },
-      { label: 'GoToCanvas', action: 'navigateToCanvas' },
-      { label: '', action: '' },
-      { label: '', action: '' },
-      // { label: 'CreateOffscreenCanvas', action: '' },
-      // { label: 'CreateCanvasContext', action: '' },
-      // { label: 'CanvasToTempFilePath', action: '' },
-      { label: 'CreateWorker', action: 'createWorker' },
-      { label: '', action: '' },
-      { label: '', action: '' },
-      { label: 'CreateVideoContext', action: 'navigateToVideoContext' },
-      { label: 'PreviewImage', action: 'previewImage' },
-      { label: 'ChooseImage', action: 'chooseImage' },
-      { label: 'Go To WXML', action: 'navigateToWxml' },
-      { label: '', action: '' },
-      { label: '', action: '' },
-      { label: 'SaveFile & OpenDocument', action: 'saveFile' },
-      { label: '', action: '' },
-      { label: 'GetSavedFileList', action: 'getSavedFileList' },
-      { label: 'ScanCode', action: 'scanQRCode' },
-      { label: '', action: '' },
-      { label: '', action: '' },
-      { label: 'GetLocation', action: 'getCurrentLocation' },
-      { label: 'ChooseLocation', action: 'chooseLocation' },
-      { label: 'OpenLocation', action: 'openLocation' },
-      { label: 'Login', action: 'login' },
-      { label: 'CheckSession', action: '' },
-      { label: 'GetUserProfile', action: '' },
-      { label: 'SendWebviewEvent', action: 'navigateToWebview' },
+    info: '', 
+    currentPage: 0,
+    buttonsPerPage: 99,
+    title: '',
+    categorizedButtons: [
+      {
+        category: '1. Foundation',
+        buttons: [
+          { label: 'Get SystemInfoSync', action: 'getSystemInfoSync' },
+          { label: 'Get UpdateManager', action: 'getUpdateManager' },
+          { label: 'Get LaunchOptionsSync', action: 'getLaunchOptionsSync' },
+        ]
+      },
+      {
+        category: '2. Routing',
+        buttons: [
+          { label: 'NavigateTo', action: 'navigateTo' },
+          { label: 'NavigateToMiniProgram', action: 'handleNavigateToMiniProgram'},
+        ]
+      },
+      {
+        category: '3. Jump',
+        buttons: [
+          { label: 'EventChanel', action: 'handleEventChanelTap' },
+          { label: 'ExitMiniProgram', action: 'handleExitMiniProgram' },
+        ]
+      },
+      {
+        category: '4. Forward',
+        buttons: [
+          { label: 'ShowShareMenu', action: 'showShareMenu' },
+        ]
+      },
+      {
+        category: '5. Interface',
+        buttons: [
+          { label: 'ShowLoding', action: 'showLoding' },
+          { label: 'ShowModal', action: 'showModal' },
+          { label: 'ShowToast', action: 'showToast' },
+        ]
+      },
+      {
+        category: '6. Internet',
+        buttons: [
+          { label: 'UploadFile', action: 'uploadFile' },
+          { label: 'DownloadFile', action: 'downloadFile' },
+          { label: 'ConnectSocket', action: 'connectSocket' },
+        ]
+      },
+      {
+        category: '7. Data Cache',
+        buttons: [
+          { label: 'SetStorageSync', action: 'setStorageData' },
+          { label: 'GetStorage', action: 'getStorageData' },
+          { label: 'ClearStorage', action: 'clearStorageData' },
+        ]
+      },
+      {
+        category: '8. Data Analysis',
+        buttons: [
+          { label: 'ReportEvent', action: 'reportEvent' },
+        ]
+      },
+      {
+        category: '9. Canvas',
+        buttons: [
+          { label: 'GoToCanvas', action: 'navigateToCanvas' },
+        ]
+      },
+      {
+        category: '10. Worker',
+        buttons: [
+          { label: 'CreateWorker', action: 'createWorker' },
+        ]
+      },
+      {
+        category: '11. Media',
+        buttons: [
+          { label: 'CreateVideoContext', action: 'navigateToVideoContext' },
+          { label: 'PreviewImage', action: 'previewImage' },
+          { label: 'ChooseImage', action: 'chooseImage' },
+        ]
+      },
+      {
+        category: '12. WXML',
+        buttons: [
+          { label: 'Go To WXML', action: 'navigateToWxml' },
+        ]
+      },
+      {
+        category: '13. Document',
+        buttons: [
+          { label: 'SaveFile & OpenDocument', action: 'saveFile' },
+          { label: 'GetSavedFileList', action: 'getSavedFileList' },
+        ]
+      },
+      {
+        category: '14. Equipment',
+        buttons: [
+          { label: 'ScanCode', action: 'scanQRCode' },
+        ]
+      },
+      {
+        category: '15. Location',
+        buttons: [
+          { label: 'GetLocation', action: 'getCurrentLocation' },
+          { label: 'ChooseLocation', action: 'chooseLocation' },
+          { label: 'OpenLocation', action: 'openLocation' },
+        ]
+      },
     ],
-    visibleButtons: []
   },
 
   onLoad() {
-    this.updateVisibleButtons();
     wx.onCopyUrl(() => {
       return { query: 'a=1&b=2' }
     })
-  },
-
-  // ฟังก์ชันอัปเดตปุ่มที่แสดง
-  updateVisibleButtons() {
-    const { currentPage, buttonsPerPage, allButtons } = this.data;
-    const start = currentPage * buttonsPerPage;
-    const end = start + buttonsPerPage;
-    const visibleButtons = allButtons.slice(start, end);
-
-    // กำหนด title สำหรับหน้า
-    const pageTitles = [
-      '1. Foundation',
-      '2. Routing',
-      '3. Jump',
-      '4. Forward',
-      '5. interface',
-      '6. Internet',
-      '7. Data Cache',
-      '8. Data analysis',
-      '9. Canvas',
-      '10. Worker',
-      '11. Media',
-      '12. WXML',
-      '13. Document',
-      '14. Equipment',
-      '15. Location',
-      '16. Open Interfaces',
-      '19. H5 Real-Time Communication',
-    ];
-
-    const title = pageTitles[currentPage] || `Page ${currentPage + 1}`;
-
-    this.setData({ visibleButtons, title });
   },
 
   clearData: function () {
@@ -111,7 +130,6 @@ Page({
     console.log('Data cleared:', this.data.myData);
   },
 
-  // ฟังก์ชันเรียกใช้งานเมื่อกดปุ่ม
   handleButtonTap(e) {
     const action = e.currentTarget.dataset.action;
     if (this[action]) {
@@ -120,7 +138,6 @@ Page({
   },
 
   navigateToWxml() {
-    // ใช้ wx.navigateTo เพื่อไปยังหน้าใหม่
     wx.navigateTo({
       url: '/pages/wxml/wxml',
       success: function () {
@@ -133,7 +150,6 @@ Page({
   },
 
   navigateToWebview() {
-    // ใช้ wx.navigateTo เพื่อไปยังหน้าใหม่
     wx.navigateTo({
       url: '/pages/webview/webview',
       success: function () {
@@ -261,7 +277,7 @@ Page({
       url: '/pages/newPage2/newPage2',
       success: (res) => {
         const eventChannel = res.eventChannel;
-        eventChannel.emit('sendData', { message: 'Hello from first page! CCCCC' });
+        eventChannel.emit('sendData', { message: 'Hello from first page!' });
       }
     });
   },
@@ -298,7 +314,7 @@ Page({
     wx.showShareMenu({
       success() {
         wx.showToast({
-          title: 'เปิดเมนูการแชร์ddd',
+          title: 'เปิดเมนูการแชร์',
           icon: 'success',
         });
         console.log('Share menu shown successfully');
@@ -452,13 +468,19 @@ Page({
     });
   },
 
-
-
   // Download File
   downloadFile() {
+    wx.showLoading({
+      title: 'กำลังดาวน์โหลด...',  // แสดงข้อความระหว่างโหลด
+      mask: true  // จะป้องกันไม่ให้ผู้ใช้กดปุ่มอื่นในระหว่างดาวน์โหลด
+    });
+
     wx.downloadFile({
-      url: 'http://localhost:8080/download/The2024.pdf',
+      // url: 'http://localhost:8080/download/The2024.pdf',
+      url: 'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_10mb.mp4',
       success: (res) => {
+        wx.hideLoading();  // ซ่อน loading เมื่อดาวน์โหลดเสร็จ
+
         if (res.statusCode === 200) {
           const tempFilePath = res.tempFilePath;
           console.log('ดาวน์โหลดไฟล์สำเร็จ:', tempFilePath);
@@ -473,6 +495,7 @@ Page({
         }
       },
       fail: (error) => {
+        wx.hideLoading();
         console.log('ดาวน์โหลดล้มเหลว:', error);
         wx.showToast({
           title: 'ดาวน์โหลดล้มเหลว',
@@ -482,13 +505,14 @@ Page({
     });
   },
 
+
   // 📥 ฟังก์ชันสำหรับเก็บข้อมูลใน Storage
   setStorageData() {
     try {
-      wx.setStorageSync('username', 'pirapat');
+      wx.setStorageSync('username', 'admin');
       const storedData = wx.getStorageSync('username');
       this.setData({
-        info: `✅ ข้อมูลถูกจัดเก็บเรียบร้อย! ข้อมูลที่จัดเก็บ: ${storedData}`
+        info: `✅ ข้อมูลถูกจัดเก็บเรียบร้อย!\nข้อมูลที่จัดเก็บ: ${storedData}`
       });
     } catch (e) {
       this.setData({ info: '❌ เกิดข้อผิดพลาดในการจัดเก็บข้อมูล' });
@@ -591,15 +615,36 @@ Page({
   },
 
   scanQRCode() {
-    wx.scanCode({
-      success: (res) => {
-        this.setData({ info: 'สแกน QR Code สำเร็จ' });
-      },
-      fail: (err) => {
-        this.setData({ info: 'สแกน QR Code ไม่สำเร็จ' });
+  wx.scanCode({
+    success: (res) => {
+      this.setData({ info: 'สแกน QR Code สำเร็จ' });
+      const qrCodeUrl = res.result; // ค่าที่ได้จาก QR code
+
+      if (qrCodeUrl) {
+        // เปิด URL ในเบราว์เซอร์ภายนอก
+        wx.openUrl({
+          url: qrCodeUrl
+        });
+
+        // หรือคัดลอก URL ไปยังคลิปบอร์ด
+        wx.setClipboardData({
+          data: qrCodeUrl,
+          success: () => {
+            wx.showToast({
+              title: 'คัดลอกลิงก์เรียบร้อย',
+            });
+          }
+        });
       }
-    });
-  },
+    },
+    fail: (err) => {
+      this.setData({ info: 'สแกน QR Code ไม่สำเร็จ' });
+    }
+  });
+},
+
+
+
 
   saveFile() {
     wx.downloadFile({
@@ -859,4 +904,58 @@ Page({
       },
     });
   },
+
+  fetchUserData() {
+    const opts = {
+      api_name: 'fetchExternalAPI',  // ชื่อ API ที่กำหนดเอง
+      success: (res) => {
+        console.log('API Response:', res);
+        if (res.success) {
+          this.setData({
+            userData: res.data
+          });
+          // แจ้งเตือนเมื่อข้อมูลถูกส่งกลับมาจาก server
+          wx.showToast({
+            title: 'ข้อมูลถูกดึงเรียบร้อย',
+            icon: 'success',
+            duration: 2000  // ระยะเวลาที่แจ้งเตือนจะแสดง
+          });
+        } else {
+          this.setData({
+            errorMessage: 'ไม่สามารถดึงข้อมูลผู้ใช้ได้'
+          });
+          // แจ้งเตือนเมื่อไม่สามารถดึงข้อมูลได้
+          wx.showToast({
+            title: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+      },
+      fail: (res) => {
+        this.setData({
+          errorMessage: 'เกิดข้อผิดพลาด: ' + res.errMsg
+        });
+        // แจ้งเตือนเมื่อเกิดข้อผิดพลาดในการเรียก API
+        wx.showToast({
+          title: 'ไม่สามารถเชื่อมต่อ API ได้',
+          icon: 'none',
+          duration: 2000
+        });
+      },
+      complete: (res) => {
+        console.log('API request completed', res);
+      },
+      data: { // ข้อมูลที่จะส่งไปยัง API
+        url: 'http://localhost:8080/api/user',  // URL ของ API ภายนอก
+        method: 'GET',  // HTTP Method
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    };
+
+    wx.invokeNativePlugin(opts);
+  },
+
 });
