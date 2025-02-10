@@ -12,9 +12,15 @@
     "workers": "workers/",
     "style": "v2",
     "window": {
+        "enableShareAppMessage": true,
         "backgroundTextStyle": "light",
         "navigationBarBackgroundColor": "#fff",
         "navigationBarTitleText": "",
         "navigationBarTextStyle": "black"
+    },
+    "permission": {
+    "scope.userLocation": {
+      "desc": "แอปต้องการใช้ตำแหน่งของคุณ"
     }
+  }
 }

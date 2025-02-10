@@ -20,7 +20,7 @@
 
   <!-- กล่องแสดงผลข้อมูล -->
   <view class="info-box">
-    <text style="font-size: 20px;">{{info}}</text>
+    <text style="font-size: 20px; word-break: break-word; white-space: normal;">{{info}}</text>
     <image src="{{imagePath}}" mode="aspectFit" style="width: 300px; height: 200px" />
   </view>
 </view>

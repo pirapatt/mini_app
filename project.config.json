@@ -1,7 +1,7 @@
 {
 	"projectid": "mp4s17v6ok9b3f8c_mini_app_test",
 	"setting": {
-		"urlCheck": false,
+		"urlCheck": true,
 		"es6": true,
 		"postcss": false,
 		"minified": true,

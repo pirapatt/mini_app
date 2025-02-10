@@ -3,7 +3,7 @@
 Page({
   data: {
     imagePath: '',
-    info: '', 
+    info: '',
     currentPage: 0,
     buttonsPerPage: 99,
     title: '',
@@ -20,7 +20,7 @@ Page({
         category: '2. Routing',
         buttons: [
           { label: 'NavigateTo', action: 'navigateTo' },
-          { label: 'NavigateToMiniProgram', action: 'handleNavigateToMiniProgram'},
+          { label: 'NavigateToMiniProgram', action: 'handleNavigateToMiniProgram' },
         ]
       },
       {
@@ -119,7 +119,22 @@ Page({
   onLoad() {
     wx.onCopyUrl(() => {
       return { query: 'a=1&b=2' }
-    })
+    });
+    wx.authorize({
+      scope: 'scope.userLocation',
+      success() {
+        wx.getLocation({
+          type: 'wgs84',
+          success(res) {
+            console.log('ละติจูด:', res.latitude);
+            console.log('ลองจิจูด:', res.longitude);
+          }
+        });
+      },
+      fail() {
+        console.log('ผู้ใช้ปฏิเสธการเข้าถึงตำแหน่ง');
+      }
+    });
   },
 
   clearData: function () {
@@ -312,6 +327,7 @@ Page({
   // Show Share Menu
   showShareMenu() {
     wx.showShareMenu({
+      showShareItems: ['qq', 'qzone', 'wechatFriends', 'wechatMoment'],
       success() {
         wx.showToast({
           title: 'เปิดเมนูการแชร์',
@@ -396,7 +412,7 @@ Page({
       success(res) {
         const filePath = res.tempFilePaths[0];
         wx.uploadFile({
-          url: 'http://localhost:8080/upload',
+          url: 'https://testfile.free.beeceptor.com',
           filePath: filePath,
           name: 'file',
           formData: {
@@ -471,26 +487,39 @@ Page({
   // Download File
   downloadFile() {
     wx.showLoading({
-      title: 'กำลังดาวน์โหลด...',  // แสดงข้อความระหว่างโหลด
-      mask: true  // จะป้องกันไม่ให้ผู้ใช้กดปุ่มอื่นในระหว่างดาวน์โหลด
+      title: 'กำลังดาวน์โหลด...',
+      mask: true
     });
 
     wx.downloadFile({
-      // url: 'http://localhost:8080/download/The2024.pdf',
-      url: 'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_10mb.mp4',
+      url: 'https://server-for-miniapp.onrender.com/download/The2024.pdf',  // URL ที่ใช้ดาวน์โหลดไฟล์
       success: (res) => {
-        wx.hideLoading();  // ซ่อน loading เมื่อดาวน์โหลดเสร็จ
+        wx.hideLoading();
 
         if (res.statusCode === 200) {
-          const tempFilePath = res.tempFilePath;
+          const tempFilePath = res.tempFilePath;  // พาธของไฟล์ที่ดาวน์โหลด
+
           console.log('ดาวน์โหลดไฟล์สำเร็จ:', tempFilePath);
+
+          wx.showToast({
+            title: 'ดาวน์โหลดสำเร็จ',
+            icon: 'success',
+          });
+          // แสดงสถานะสำเร็จใน setData
           this.setData({
-            info: 'ดาวน์โหลดไฟล์สำเร็จ: ' + tempFilePath
+            info: 'ดาวน์โหลดไฟล์สำเร็จ: ' + tempFilePath + '\nStatus Code: ' + res.statusCode
           });
         } else {
+          // แสดงสถานะล้มเหลวพร้อม statusCode
           wx.showToast({
-            title: 'ดาวน์โหลดล้มเหลว',
+            title: 'ดาวน์โหลดล้มเหลว (Status Code: ' + res.statusCode + ')',
             icon: 'error',
+          });
+          console.log('ดาวน์โหลดล้มเหลว, Status Code:', res.statusCode);
+
+          // แสดงสถานะล้มเหลวใน setData
+          this.setData({
+            info: 'ดาวน์โหลดล้มเหลว (Status Code: ' + res.statusCode + ')'
           });
         }
       },
@@ -498,8 +527,13 @@ Page({
         wx.hideLoading();
         console.log('ดาวน์โหลดล้มเหลว:', error);
         wx.showToast({
-          title: 'ดาวน์โหลดล้มเหลว',
+          title: 'ดาวน์โหลดล้มเหลว (Error: ' + error.errMsg + ')',
           icon: 'error',
+        });
+
+        // แสดงสถานะล้มเหลวใน setData
+        this.setData({
+          info: 'ดาวน์โหลดล้มเหลว (Error: ' + error.errMsg + ')'
         });
       }
     });
@@ -556,10 +590,8 @@ Page({
     });
   },
 
-
   getCurrentLocation() {
     wx.getLocation({
-      type: 'wgs84',
       success: (res) => {
         const latitude = res.latitude;
         const longitude = res.longitude;
@@ -615,41 +647,43 @@ Page({
   },
 
   scanQRCode() {
-  wx.scanCode({
-    success: (res) => {
-      this.setData({ info: 'สแกน QR Code สำเร็จ' });
-      const qrCodeUrl = res.result; // ค่าที่ได้จาก QR code
+    wx.scanCode({
+      success: (res) => {
+        this.setData({ info: 'สแกน QR Code สำเร็จ' });
+        const qrCodeUrl = res.result; // ค่าที่ได้จาก QR code
 
-      if (qrCodeUrl) {
-        // เปิด URL ในเบราว์เซอร์ภายนอก
-        wx.openUrl({
-          url: qrCodeUrl
-        });
+        if (qrCodeUrl) {
+          // เปิด URL ในเบราว์เซอร์ภายนอก
+          wx.openUrl({
+            url: qrCodeUrl
+          });
 
-        // หรือคัดลอก URL ไปยังคลิปบอร์ด
-        wx.setClipboardData({
-          data: qrCodeUrl,
-          success: () => {
-            wx.showToast({
-              title: 'คัดลอกลิงก์เรียบร้อย',
-            });
-          }
-        });
+          // หรือคัดลอก URL ไปยังคลิปบอร์ด
+          wx.setClipboardData({
+            data: qrCodeUrl,
+            success: () => {
+              wx.showToast({
+                title: 'คัดลอกลิงก์เรียบร้อย',
+              });
+            }
+          });
+        }
+      },
+      fail: (err) => {
+        this.setData({ info: 'สแกน QR Code ไม่สำเร็จ' });
       }
-    },
-    fail: (err) => {
-      this.setData({ info: 'สแกน QR Code ไม่สำเร็จ' });
-    }
-  });
-},
-
-
-
+    });
+  },
 
   saveFile() {
+    wx.showLoading({
+      title: 'กำลังดาวน์โหลด...',
+      mask: true
+    });
     wx.downloadFile({
-      url: 'http://localhost:8080/download/The2024.pdf',
+      url: 'https://server-for-miniapp.onrender.com/download/The2024.pdf',
       success: (res) => {
+        wx.hideLoading();
         if (res.statusCode === 200) {
           const tempFilePath = res.tempFilePath;
           console.log('ดาวน์โหลดไฟล์สำเร็จ:', tempFilePath);
@@ -659,7 +693,7 @@ Page({
             success: (saveRes) => {
               console.log('บันทึกไฟล์สำเร็จ:', saveRes.savedFilePath);
               this.setData({
-                info: 'ดาวน์โหลดและบันทึกไฟล์สำเร็จ: ' + saveRes.savedFilePath
+                info: 'ดาวน์โหลดและบันทึกไฟล์สำเร็จ: ' + saveRes.savedFilePath + '\nStatus Code: ' + res.statusCode
               });
 
               // เปิดไฟล์ที่บันทึก
@@ -671,20 +705,35 @@ Page({
                 title: 'ไม่สามารถบันทึกไฟล์ได้',
                 icon: 'error',
               });
+              // แสดงข้อความการบันทึกล้มเหลวใน setData
+              this.setData({
+                info: 'ไม่สามารถบันทึกไฟล์ได้ (Error: ' + err.errMsg + ')'
+              });
             }
           });
         } else {
           wx.showToast({
-            title: 'ดาวน์โหลดล้มเหลว',
+            title: 'ดาวน์โหลดล้มเหลว (Status Code: ' + res.statusCode + ')',
             icon: 'error',
+          });
+          console.log('ดาวน์โหลดล้มเหลว, Status Code:', res.statusCode);
+
+          // แสดงข้อความสถานะดาวน์โหลดล้มเหลวใน setData
+          this.setData({
+            info: 'ดาวน์โหลดล้มเหลว (Status Code: ' + res.statusCode + ')'
           });
         }
       },
       fail: (error) => {
         console.log('ดาวน์โหลดล้มเหลว:', error);
         wx.showToast({
-          title: 'ดาวน์โหลดล้มเหลว',
+          title: 'ดาวน์โหลดล้มเหลว (Error: ' + error.errMsg + ')',
           icon: 'error',
+        });
+
+        // แสดงข้อความสถานะดาวน์โหลดล้มเหลวใน setData
+        this.setData({
+          info: 'ดาวน์โหลดล้มเหลว (Error: ' + error.errMsg + ')'
         });
       }
     });
