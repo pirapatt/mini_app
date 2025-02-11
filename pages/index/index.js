@@ -1,4 +1,3 @@
-//รวมหน้าเดียว
 
 Page({
   data: {
@@ -117,25 +116,66 @@ Page({
   },
 
   onLoad() {
-    wx.onCopyUrl(() => {
-      return { query: 'a=1&b=2' }
-    });
-    wx.authorize({
-      scope: 'scope.userLocation',
-      success() {
-        wx.getLocation({
-          type: 'wgs84',
-          success(res) {
-            console.log('ละติจูด:', res.latitude);
-            console.log('ลองจิจูด:', res.longitude);
-          }
-        });
-      },
-      fail() {
-        console.log('ผู้ใช้ปฏิเสธการเข้าถึงตำแหน่ง');
+    let that = this;
+    wx.getSetting({
+      success(res) {
+        if (!res.authSetting['scope.userLocation']) {
+          // ถ้ายังไม่ได้อนุญาตการเข้าถึงตำแหน่ง
+          wx.authorize({
+            scope: 'scope.userLocation',
+            success() {
+              // ถ้าอนุญาตแล้ว ก็สามารถดึงตำแหน่งได้
+              wx.getLocation({
+                success: (res) => {
+                  const latitude = res.latitude;
+                  const longitude = res.longitude;
+                  console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+                  that.setData({  // ใช้ that เพื่อเรียก setData
+                    info: `Latitude: ${latitude}, Longitude: ${longitude}`
+                  });
+                },
+                fail: (error) => {
+                  console.log('ไม่สามารถดึงตำแหน่งได้:', error);
+                  that.setData({
+                    info: 'ไม่สามารถดึงตำแหน่งได้: ' + error.errMsg
+                  });
+                }
+              });
+            },
+            fail() {
+              // ถ้าผู้ใช้ไม่อนุญาต
+              wx.showToast({
+                title: 'โปรดอนุญาตการเข้าถึงตำแหน่ง',
+                icon: 'error'
+              });
+              that.setData({
+                info: 'โปรดอนุญาตการเข้าถึงตำแหน่ง'
+              });
+            }
+          });
+        } else {
+          // ถ้าอนุญาตแล้ว ดึงตำแหน่งได้เลย
+          wx.getLocation({
+            success: (res) => {
+              const latitude = res.latitude;
+              const longitude = res.longitude;
+              console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+              that.setData({
+                info: `Latitude: ${latitude}, Longitude: ${longitude}`
+              });
+            },
+            fail: (error) => {
+              console.log('ไม่สามารถดึงตำแหน่งได้:', error);
+              that.setData({
+                info: 'ไม่สามารถดึงตำแหน่งได้: ' + error.errMsg
+              });
+            }
+          });
+        }
       }
     });
   },
+
 
   clearData: function () {
     this.setData({
@@ -324,7 +364,7 @@ Page({
       }
     });
   },
-  // Show Share Menu
+
   showShareMenu() {
     wx.showShareMenu({
       showShareItems: ['qq', 'qzone', 'wechatFriends', 'wechatMoment'],
@@ -333,10 +373,16 @@ Page({
           title: 'เปิดเมนูการแชร์',
           icon: 'success',
         });
+        this.setData({
+          info: 'เมนูการแชร์เปิดสำเร็จ'
+        });
         console.log('Share menu shown successfully');
       },
-      fail() {
-        console.log('Failed to show share menu');
+      fail(error) {
+        this.setData({
+          info: 'ไม่สามารถเปิดเมนูการแชร์: ' + error.errMsg
+        });
+        console.log('Failed to show share menu', error);
       }
     });
   },
@@ -492,12 +538,12 @@ Page({
     });
 
     wx.downloadFile({
-      url: 'https://server-for-miniapp.onrender.com/download/The2024.pdf',  // URL ที่ใช้ดาวน์โหลดไฟล์
+      url: 'https://server-for-miniapp.onrender.com/download/The2024.pdf',
       success: (res) => {
         wx.hideLoading();
 
         if (res.statusCode === 200) {
-          const tempFilePath = res.tempFilePath;  // พาธของไฟล์ที่ดาวน์โหลด
+          const tempFilePath = res.tempFilePath;
 
           console.log('ดาวน์โหลดไฟล์สำเร็จ:', tempFilePath);
 
@@ -505,19 +551,16 @@ Page({
             title: 'ดาวน์โหลดสำเร็จ',
             icon: 'success',
           });
-          // แสดงสถานะสำเร็จใน setData
           this.setData({
             info: 'ดาวน์โหลดไฟล์สำเร็จ: ' + tempFilePath + '\nStatus Code: ' + res.statusCode
           });
         } else {
-          // แสดงสถานะล้มเหลวพร้อม statusCode
           wx.showToast({
             title: 'ดาวน์โหลดล้มเหลว (Status Code: ' + res.statusCode + ')',
             icon: 'error',
           });
           console.log('ดาวน์โหลดล้มเหลว, Status Code:', res.statusCode);
 
-          // แสดงสถานะล้มเหลวใน setData
           this.setData({
             info: 'ดาวน์โหลดล้มเหลว (Status Code: ' + res.statusCode + ')'
           });
@@ -530,8 +573,6 @@ Page({
           title: 'ดาวน์โหลดล้มเหลว (Error: ' + error.errMsg + ')',
           icon: 'error',
         });
-
-        // แสดงสถานะล้มเหลวใน setData
         this.setData({
           info: 'ดาวน์โหลดล้มเหลว (Error: ' + error.errMsg + ')'
         });
@@ -583,7 +624,6 @@ Page({
       }
     });
 
-    // แสดงข้อความเพื่อยืนยันว่าเหตุการณ์ถูกบันทึก
     wx.showToast({
       title: 'บันทึกเหตุการณ์เรียบร้อย!',
       icon: 'success'
@@ -596,11 +636,17 @@ Page({
         const latitude = res.latitude;
         const longitude = res.longitude;
         console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-        this.setData({ info: `Latitude: ${latitude}, Longitude: ${longitude}` });
+        this.setData({
+          info: `Latitude: ${latitude}, Longitude: ${longitude}`,
+        });
       },
-      fail: () => {
+      fail: (error) => {
+        console.log('Error:', error);
+        this.setData({
+          info: 'Failed to get location: ' + error.errMsg,
+        });
         wx.showToast({
-          title: 'Failed to get location',
+          title: 'Failed to get location: ' + error.errMsg,
           icon: 'error',
         });
       }
@@ -616,12 +662,18 @@ Page({
         const latitude = res.latitude;
         const longitude = res.longitude;
 
-        console.log(`Location chosen: ${name}, Address: ${address}`);
-        this.setData({ info: `Location: ${name}, Address: ${address}, Latitude: ${latitude}, Longitude: ${longitude}` });
+        console.log(`Location chosen: ${name}, Address: ${address}, Latitude: ${latitude}, Longitude: ${longitude}`);
+        this.setData({
+          info: `Location: ${name}, Address: ${address}, Latitude: ${latitude}, Longitude: ${longitude}`,
+        });
       },
-      fail: () => {
+      fail: (error) => {
+        console.log('Error:', error);  // แสดงข้อผิดพลาดใน console
+        this.setData({
+          info: 'Failed to choose location: ' + error.errMsg
+        });
         wx.showToast({
-          title: 'Failed to choose location',
+          title: 'Failed to choose location: ' + error.errMsg,  // แสดงข้อความผิดพลาดใน Toast
           icon: 'error',
         });
       }
@@ -635,22 +687,46 @@ Page({
     const name = 'Example';
     const address = '22/44';
 
-    wx.openLocation({
-      latitude,
-      longitude,
-      name,
-      address,
-      scale: 18
-    });
-
-    this.setData({ info: `Opening Location: ${name}, Address: ${address}, Latitude: ${latitude}, Longitude: ${longitude}` });
+    try {
+      wx.openLocation({
+        latitude,
+        longitude,
+        name,
+        address,
+        scale: 18,
+        success: () => {
+          this.setData({
+            info: `เปิดตำแหน่ง: ${name}, ที่อยู่: ${address}, ละติจูด: ${latitude}, ลองจิจูด: ${longitude}`
+          });
+        },
+        fail: (error) => {
+          console.log('ไม่สามารถเปิดแผนที่ได้:', error);
+          wx.showToast({
+            title: 'ไม่สามารถเปิดแผนที่ได้',
+            icon: 'error',
+          });
+          this.setData({
+            info: `ไม่สามารถเปิดตำแหน่งได้ (Error: ${error.errMsg})`
+          });
+        }
+      });
+    } catch (error) {
+      console.log('เกิดข้อผิดพลาด:', error);
+      wx.showToast({
+        title: 'เกิดข้อผิดพลาดในการเปิดแผนที่',
+        icon: 'error',
+      });
+      this.setData({
+        info: `เกิดข้อผิดพลาดในการเปิดแผนที่: ${error.message}`
+      });
+    }
   },
 
   scanQRCode() {
     wx.scanCode({
       success: (res) => {
         this.setData({ info: 'สแกน QR Code สำเร็จ' });
-        const qrCodeUrl = res.result; // ค่าที่ได้จาก QR code
+        const qrCodeUrl = res.result;
 
         if (qrCodeUrl) {
           // เปิด URL ในเบราว์เซอร์ภายนอก
@@ -801,6 +877,20 @@ Page({
 
   createWorker() {
     try {
+      // ตรวจสอบว่าอุปกรณ์รองรับ Web Worker หรือไม่
+      if (!wx.canIUse('createWorker')) {
+        console.log('❌ อุปกรณ์ไม่รองรับ Web Worker');
+        this.setData({ info: 'อุปกรณ์ไม่รองรับ Web Worker' });
+        return;  // หยุดทำงานถ้าอุปกรณ์ไม่รองรับ
+      }
+
+      // ตรวจสอบว่า Worker เดิมยังทำงานอยู่หรือไม่ ถ้ามีให้ยุติ
+      if (this.worker) {
+        console.log('❌ Worker กำลังทำงานอยู่! ทำการยุติการทำงาน');
+        this.worker.terminate();  // ยุติการทำงานของ Worker เดิม
+      }
+
+      // สร้าง Web Worker ใหม่
       const worker = wx.createWorker('workers/workers.js');
 
       if (worker) {
@@ -810,13 +900,19 @@ Page({
 
         // 📤 ส่งข้อความไปยัง Worker
         worker.postMessage({
-          action: 'start',
           data: messageToSend
         });
 
         // ✅ อัปเดต info สำหรับข้อความที่ส่ง
         this.setData({
           info: `📤 Sent: ${messageToSend}`
+        });
+
+        // แสดง toast ว่าการส่งข้อมูลสำเร็จ
+        wx.showToast({
+          title: 'ข้อมูลถูกส่งไปยัง Worker!',
+          icon: 'success',
+          duration: 2000
         });
 
         // 📩 รับข้อความตอบกลับจาก Worker
@@ -828,9 +924,11 @@ Page({
             info: `${this.data.info}\n📥 Received: ${msg.data}`
           });
 
+          // แสดง toast สำหรับการตอบกลับจาก Worker
           wx.showToast({
             title: `Reply: ${msg.data}`,
-            icon: 'success'
+            icon: 'success',
+            duration: 2000
           });
         });
 
@@ -841,13 +939,15 @@ Page({
       }
     } catch (error) {
       console.error('❗ Error:', error.message);
+      this.setData({
+        info: error.errMsg
+      });
       wx.showToast({
         title: 'Worker Error',
         icon: 'error'
       });
     }
   },
-
   // ❌ ฟังก์ชันหยุดการทำงานของ Worker
   terminateWorker() {
     if (this.worker) {
