@@ -112,6 +112,18 @@ Page({
           { label: 'OpenLocation', action: 'openLocation' },
         ]
       },
+      {
+        category: 'Custom APIs',
+        buttons: [
+          { label: 'CallApiRegistered', action: 'callApiRegistered' },
+        ]
+      },
+      {
+        category: 'Flutter Param',
+        buttons: [
+          { label: 'LaunchOptions', action: 'launchOptions' },
+        ]
+      },
     ],
   },
 
@@ -538,7 +550,7 @@ Page({
     });
 
     wx.downloadFile({
-      url: 'https://server-for-miniapp.onrender.com/download/The2024.pdf',
+      url: 'https://server-for-miniapp.onrender.com/download/Test_PDF.pdf',
       success: (res) => {
         wx.hideLoading();
 
@@ -756,24 +768,49 @@ Page({
       title: 'กำลังดาวน์โหลด...',
       mask: true
     });
+
+    const fs = wx.getFileSystemManager();
+
     wx.downloadFile({
-      url: 'https://server-for-miniapp.onrender.com/download/The2024.pdf',
+      url: 'https://server-for-miniapp.onrender.com/download/Test_PDF.pdf',
       success: (res) => {
         wx.hideLoading();
         if (res.statusCode === 200) {
           const tempFilePath = res.tempFilePath;
           console.log('ดาวน์โหลดไฟล์สำเร็จ:', tempFilePath);
 
-          wx.saveFile({
+          fs.saveFile({
             tempFilePath: tempFilePath,
             success: (saveRes) => {
               console.log('บันทึกไฟล์สำเร็จ:', saveRes.savedFilePath);
               this.setData({
                 info: 'ดาวน์โหลดและบันทึกไฟล์สำเร็จ: ' + saveRes.savedFilePath + '\nStatus Code: ' + res.statusCode
               });
+              wx.showToast({
+                title: 'บันทึกไฟล์สำเร็จ',
+                icon: 'success',
+              });
 
               // เปิดไฟล์ที่บันทึก
-              this.openDocument(saveRes.savedFilePath);
+              wx.openDocument({
+                filePath: saveRes.savedFilePath,
+                success: (openRes) => {
+                  console.log('เปิดไฟล์สำเร็จ');
+                  wx.showToast({
+                    title: 'เปิดไฟล์สำเร็จ',
+                    icon: 'success',
+                  });
+                },
+                fail: (err) => {
+                  console.log('เปิดไฟล์ล้มเหลว:', err);
+                  wx.showToast({
+                    title: 'ไม่สามารถเปิดไฟล์ได้',
+                    icon: 'error',
+                    duration: 5000
+                  });
+                }
+              });
+
             },
             fail: (err) => {
               console.log('บันทึกไฟล์ล้มเหลว:', err);
@@ -814,23 +851,6 @@ Page({
       }
     });
   },
-
-  openDocument(filePath) {
-    wx.openDocument({
-      filePath: filePath,
-      success: (res) => {
-        console.log('เปิดไฟล์สำเร็จ');
-      },
-      fail: (err) => {
-        console.log('เปิดไฟล์ล้มเหลว:', err);
-        wx.showToast({
-          title: 'ไม่สามารถเปิดไฟล์ได้',
-          icon: 'error',
-        });
-      }
-    });
-  },
-
 
   getSavedFileList() {
     wx.getSavedFileList({
@@ -1054,57 +1074,40 @@ Page({
     });
   },
 
-  fetchUserData() {
-    const opts = {
-      api_name: 'fetchExternalAPI',  // ชื่อ API ที่กำหนดเอง
-      success: (res) => {
-        console.log('API Response:', res);
-        if (res.success) {
-          this.setData({
-            userData: res.data
-          });
-          // แจ้งเตือนเมื่อข้อมูลถูกส่งกลับมาจาก server
-          wx.showToast({
-            title: 'ข้อมูลถูกดึงเรียบร้อย',
-            icon: 'success',
-            duration: 2000  // ระยะเวลาที่แจ้งเตือนจะแสดง
-          });
-        } else {
-          this.setData({
-            errorMessage: 'ไม่สามารถดึงข้อมูลผู้ใช้ได้'
-          });
-          // แจ้งเตือนเมื่อไม่สามารถดึงข้อมูลได้
-          wx.showToast({
-            title: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
-            icon: 'none',
-            duration: 2000
-          });
-        }
-      },
-      fail: (res) => {
-        this.setData({
-          errorMessage: 'เกิดข้อผิดพลาด: ' + res.errMsg
-        });
-        // แจ้งเตือนเมื่อเกิดข้อผิดพลาดในการเรียก API
+  callApiRegistered() {
+    var opts = {
+      api_name: 'testMyApi',
+      success: function (res) {
+        console.log(res);
         wx.showToast({
-          title: 'ไม่สามารถเชื่อมต่อ API ได้',
-          icon: 'none',
-          duration: 2000
+          title: 'Success!',
+          icon: 'success',
         });
       },
-      complete: (res) => {
-        console.log('API request completed', res);
+      fail: function (res) {
+        console.log(res);
       },
-      data: { // ข้อมูลที่จะส่งไปยัง API
-        url: 'http://localhost:8080/api/user',  // URL ของ API ภายนอก
-        method: 'GET',  // HTTP Method
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      complete: function (res) {
+        console.log(res);
+        wx.showToast({
+          title: 'Success!',
+          icon: 'success',
+        });
+      },
+      data: {
+        name: 'kka',
+        age: 22,
       }
-    };
+    }
 
     wx.invokeNativePlugin(opts);
   },
 
+  launchOptions() {
+    var paramFromFlutter = wx.getLaunchOptionsSync()
+    const val = "Client param: " + JSON.stringify(paramFromFlutter.extendData)
+    this.setData({
+      info: val
+    })
+  }
 });
