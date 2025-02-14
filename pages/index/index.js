@@ -643,25 +643,29 @@ Page({
   },
 
   getCurrentLocation() {
-    wx.getLocation({
-      success: (res) => {
-        const latitude = res.latitude;
-        const longitude = res.longitude;
-        console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-        this.setData({
-          info: `Latitude: ${latitude}, Longitude: ${longitude}`,
-        });
-      },
-      fail: (error) => {
-        console.log('Error:', error);
-        this.setData({
-          info: 'Failed to get location: ' + error.errMsg,
-        });
-        wx.showToast({
-          title: 'Failed to get location: ' + error.errMsg,
-          icon: 'error',
-        });
-      }
+    return new Promise((resolve, reject) => {
+      wx.getLocation({
+        success: (res) => {
+          const latitude = res.latitude;
+          const longitude = res.longitude;
+          console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+          this.setData({
+            info: `Latitude: ${latitude}, Longitude: ${longitude}`,
+          });
+          resolve(res); // ส่งค่าผลลัพธ์เมื่อสำเร็จ
+        },
+        fail: (error) => {
+          console.log('Error:', error);
+          this.setData({
+            info: 'Failed to get location: ' + error.errMsg,
+          });
+          wx.showToast({
+            title: 'Failed to get location: ' + error.errMsg,
+            icon: 'error',
+          });
+          reject(error); // ส่งข้อผิดพลาดเมื่อไม่สามารถดึงตำแหน่งได้
+        }
+      });
     });
   },
 
@@ -1074,35 +1078,48 @@ Page({
     });
   },
 
+  //miniApp to flutter
   callApiRegistered() {
-    var opts = {
-      api_name: 'testMyApi',
-      success: function (res) {
-        console.log(res);
-        wx.showToast({
-          title: 'Success!',
-          icon: 'success',
-        });
-      },
-      fail: function (res) {
-        console.log(res);
-      },
-      complete: function (res) {
-        console.log(res);
-        wx.showToast({
-          title: 'Success!',
-          icon: 'success',
-        });
-      },
-      data: {
-        name: 'kka',
-        age: 22,
-      }
-    }
+    this.getCurrentLocation()
+      .then((location) => {
+        var opts = {
+          api_name: 'testMyApi',
+          success: function (res) {
+            console.log(res);
+            wx.showToast({
+              title: 'Success!',
+              icon: 'success',
+            });
+          },
+          fail: function (res) {
+            console.log(res);
+          },
+          complete: function (res) {
+            console.log(res);
+            wx.showToast({
+              title: 'Success!',
+              icon: 'success',
+            });
+          },
+          data: {
+            latitude: location.latitude,
+            longitude: location.longitude
+          }
+        };
 
-    wx.invokeNativePlugin(opts);
+        // เรียก wx.invokeNativePlugin ด้วย options ที่ได้จากการเก็บตำแหน่ง
+        wx.invokeNativePlugin(opts);
+      })
+      .catch((error) => {
+        console.error('Error getting location: ', error);
+        wx.showToast({
+          title: 'ไม่สามารถดึงตำแหน่งได้',
+          icon: 'error',
+        });
+      });
   },
 
+  //ส่งมาจาก Flutter เพื่อกำหนดค่าเริ่มต้นใน Mini Program
   launchOptions() {
     var paramFromFlutter = wx.getLaunchOptionsSync()
     const val = "Client param: " + JSON.stringify(paramFromFlutter.extendData)
