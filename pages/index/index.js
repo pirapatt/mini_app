@@ -1,5 +1,12 @@
 
 Page({
+  onShareAppMessage() {
+    return {
+      title: 'แชร์แอปนี้ให้เพื่อน!',
+      path: '/pages/index/index',
+    };
+  },
+
   data: {
     imagePath: '',
     info: '',
@@ -266,31 +273,32 @@ Page({
   getUpdateManager() {
     const updateManager = wx.getUpdateManager();
 
-    // ตรวจสอบการอัปเดต
     updateManager.onCheckForUpdate((res) => {
-      console.log('Has update:', res.hasUpdate);  // ตรวจสอบว่ามีอัปเดตหรือไม่
+      console.log('🔍 Checking update:', res.hasUpdate);
+      wx.showToast({
+        title: 'Checking update...',
+        icon: 'loading'
+      });
+
       this.setData({ info: 'Has Update: ' + res.hasUpdate });
     });
 
-    // หากมีการอัปเดต, ทำการดาวน์โหลดและติดตั้ง
     updateManager.onUpdateReady(() => {
       wx.showModal({
         title: 'Update Available',
-        content: 'A new update is available. Do you want to restart?',
+        content: 'A new update is available. Restart now?',
         success(res) {
           if (res.confirm) {
-            // รีสตาร์ทแอปเพื่อใช้การอัปเดต
             updateManager.applyUpdate();
           }
         }
       });
     });
 
-    // หากไม่สามารถดาวน์โหลดการอัปเดต, แสดงข้อผิดพลาด
     updateManager.onUpdateFailed(() => {
       wx.showModal({
         title: 'Update Failed',
-        content: 'There was an error while updating the app.',
+        content: 'There was an error updating the app.',
         showCancel: false
       });
     });
@@ -378,25 +386,37 @@ Page({
   },
 
   showShareMenu() {
-    wx.showShareMenu({
-      showShareItems: ['qq', 'qzone', 'wechatFriends', 'wechatMoment'],
-      success() {
-        wx.showToast({
-          title: 'เปิดเมนูการแชร์',
-          icon: 'success',
-        });
-        this.setData({
-          info: 'เมนูการแชร์เปิดสำเร็จ'
-        });
-        console.log('Share menu shown successfully');
-      },
-      fail(error) {
-        this.setData({
-          info: 'ไม่สามารถเปิดเมนูการแชร์: ' + error.errMsg
-        });
-        console.log('Failed to show share menu', error);
-      }
-    });
+    const that = this;
+
+    // ตรวจสอบว่า showShareMenu รองรับในอุปกรณ์หรือไม่
+    if (wx.canIUse('showShareMenu')) {
+      wx.showShareMenu({
+        withShareTicket: true,  // enable withShareTicket if needed
+        showShareItems: ['qq', 'qzone', 'wechatFriends', 'wechatMoment'],
+        success() {
+          wx.showToast({
+            title: 'เปิดเมนูการแชร์',
+            icon: 'success',
+          });
+          that.setData({ // ใช้ that เพื่อเข้าถึง this ของ page
+            info: 'เมนูการแชร์เปิดสำเร็จ'
+          });
+          console.log('Share menu shown successfully');
+        },
+        fail(error) {
+          that.setData({ // ใช้ that เพื่อเข้าถึง this ของ page
+            info: 'ไม่สามารถเปิดเมนูการแชร์: ' + error.errMsg
+          });
+          console.log('Failed to show share menu', error);
+        }
+      });
+    } else {
+      // ถ้าไม่รองรับ
+      that.setData({
+        info: 'ไม่รองรับฟังก์ชัน showShareMenu ในอุปกรณ์นี้'
+      });
+      console.log('showShareMenu is not available on this device');
+    }
   },
 
   // updateShareMenu() {
@@ -876,8 +896,6 @@ Page({
     });
   },
 
-
-
   chooseImage() {
     wx.chooseImage({
       count: 1,
@@ -901,70 +919,69 @@ Page({
 
   createWorker() {
     try {
-      // ตรวจสอบว่าอุปกรณ์รองรับ Web Worker หรือไม่
       if (!wx.canIUse('createWorker')) {
         console.log('❌ อุปกรณ์ไม่รองรับ Web Worker');
         this.setData({ info: 'อุปกรณ์ไม่รองรับ Web Worker' });
-        return;  // หยุดทำงานถ้าอุปกรณ์ไม่รองรับ
+        return;
       }
 
-      // ตรวจสอบว่า Worker เดิมยังทำงานอยู่หรือไม่ ถ้ามีให้ยุติ
       if (this.worker) {
         console.log('❌ Worker กำลังทำงานอยู่! ทำการยุติการทำงาน');
-        this.worker.terminate();  // ยุติการทำงานของ Worker เดิม
+        try {
+          this.worker.terminate();
+          console.log('✅ Worker เดิมถูกยุติแล้ว');
+        } catch (error) {
+          console.error('❗ Error terminating the worker:', error.message);
+        }
       }
 
-      // สร้าง Web Worker ใหม่
-      const worker = wx.createWorker('workers/workers.js');
+      // ✅ ใช้ Absolute Path (`/workers/workers.js`)
+      const worker = wx.createWorker('/workers/workers.js');
 
-      if (worker) {
-        console.log('✅ Worker Created Successfully');
+      if (!worker) {
+        throw new Error('❌ Failed to create worker');
+      }
 
-        const messageToSend = 'Hello from main thread!';
+      console.log('✅ Worker Created Successfully');
 
-        // 📤 ส่งข้อความไปยัง Worker
-        worker.postMessage({
-          data: messageToSend
-        });
+      const messageToSend = 'Hello from main thread!';
 
-        // ✅ อัปเดต info สำหรับข้อความที่ส่ง
+      // 📤 ส่งข้อความไปยัง Worker (ต้องเป็น String เท่านั้น)
+      worker.postMessage(messageToSend);
+
+      // ✅ อัปเดต UI
+      this.setData({
+        info: `📤 Sent: ${messageToSend}`
+      });
+
+      wx.showToast({
+        title: 'ข้อมูลถูกส่งไปยัง Worker!',
+        icon: 'success',
+        duration: 2000
+      });
+
+      // ✅ รับข้อความจาก Worker
+      worker.onMessage((msg) => {
+        console.log('📥 Received from Worker:', msg);
+
         this.setData({
-          info: `📤 Sent: ${messageToSend}`
+          info: `${this.data.info}\n📥 Received: ${msg}`
         });
 
-        // แสดง toast ว่าการส่งข้อมูลสำเร็จ
         wx.showToast({
-          title: 'ข้อมูลถูกส่งไปยัง Worker!',
+          title: `Reply: ${msg}`,
           icon: 'success',
           duration: 2000
         });
+      });
 
-        // 📩 รับข้อความตอบกลับจาก Worker
-        worker.onMessage((msg) => {
-          console.log('📥 Received from Worker:', msg.data);
+      // ✅ บันทึก Worker เพื่อใช้งานต่อ
+      this.worker = worker;
 
-          // ✅ เพิ่มข้อความที่ได้รับลงใน info
-          this.setData({
-            info: `${this.data.info}\n📥 Received: ${msg.data}`
-          });
-
-          // แสดง toast สำหรับการตอบกลับจาก Worker
-          wx.showToast({
-            title: `Reply: ${msg.data}`,
-            icon: 'success',
-            duration: 2000
-          });
-        });
-
-        // เก็บ worker ไว้ใช้งานภายหลัง
-        this.worker = worker;
-      } else {
-        throw new Error('Failed to create worker');
-      }
     } catch (error) {
       console.error('❗ Error:', error.message);
       this.setData({
-        info: error.errMsg
+        info: `Error: ${error.message}`
       });
       wx.showToast({
         title: 'Worker Error',
@@ -1078,7 +1095,7 @@ Page({
     });
   },
 
-  //miniApp to flutter
+  //เรียกใช้ฟังก์ชันจาก Flutter ไว้ในมินิโปรแกรม
   callApiRegistered() {
     this.getCurrentLocation()
       .then((location) => {

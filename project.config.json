@@ -11,7 +11,8 @@
 		"uploadWithSourceMap": true,
 		"uglifyFileName": true,
 		"remoteDebugLogEnable": true,
-		"prefetch": false
+		"prefetch": false,
+		"workers": true
 	},
 	"compileType": "miniprogram",
 	"createTime": 1737016155533,

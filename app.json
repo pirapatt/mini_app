@@ -9,7 +9,7 @@
         "pages/webview/webview",
         "pages/wxml/wxml"
     ],
-    "workers": "workers/",
+    "workers": "workers",
     "style": "v2",
     "window": {
         "enableShareAppMessage": true,
